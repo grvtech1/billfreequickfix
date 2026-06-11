@@ -89,6 +89,8 @@
   .li:hover{background:var(--fix-tint)}
   .li.sel{background:var(--fix-tint);border-left-color:var(--fix)}
   .li .li-sys{font-size:11px;font-family:var(--mono);color:var(--fix-deep);margin-bottom:3px}
+  .systag{display:inline-flex;align-items:center;gap:6px}
+  .sysmono{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;border-radius:5px;border:1px solid;font-family:var(--mono);font-size:10px;font-weight:700;line-height:1;letter-spacing:0;text-transform:none;flex:none}
   .li .li-sym{font-size:13.5px;color:var(--ink);font-weight:450;line-height:1.4}
   .li .li-type{display:inline-block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:2px 7px;border-radius:5px;margin-top:7px}
   .li .li-img{font-size:10px;color:var(--ink-4);margin-left:7px}
@@ -301,6 +303,14 @@ function hl(t){if(!query)return esc(t);const terms=queryTerms().map(x=>x.replace
 const KB_SECRET=(new URLSearchParams(location.search).get('k'))||"";   // ← or hardcode the shared secret
 function apiHeaders(){const h={"Content-Type":"application/json"};if(KB_SECRET)h["x-kb-secret"]=KB_SECRET;return h;}
 function post(url,body){try{fetch(url,{method:"POST",headers:apiHeaders(),body:JSON.stringify(body)}).catch(()=>{});}catch(e){}}
+/* ---- per-POS colour + monogram (golden-angle spread over the systems) ---- */
+let SYS_HUE={};
+function buildSysHues(){const sys=[...new Set(KB.map(r=>r.system))].sort();SYS_HUE={};sys.forEach((s,i)=>{SYS_HUE[s]=Math.round((i*137.508)%360);});}
+function sysHue(s){if(s in SYS_HUE)return SYS_HUE[s];let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h%360;}
+function sysGlyph(s){const w=(s||"").trim().split(/\s+/).filter(Boolean);return((w.length>1?w[0][0]+w[1][0]:(s||"").slice(0,2))||"?").toUpperCase();}
+function sysCol(s){const h=sysHue(s);return{bg:`hsl(${h} 58% 93%)`,fg:`hsl(${h} 58% 31%)`,bd:`hsl(${h} 42% 83%)`};}
+function sysMono(s){const c=sysCol(s);return `<span class="sysmono" style="background:${c.bg};color:${c.fg};border-color:${c.bd}">${esc(sysGlyph(s))}</span>`;}
+function sysTag(s){const c=sysCol(s);return `<span class="systag">${sysMono(s)}<span style="color:${c.fg}">${esc(s)}</span></span>`;}
 function monthsSince(ym){if(!ym)return 99;const[a,b]=ym.split('-').map(Number);const[y,m]=TODAY.split('-').map(Number);return (y-a)*12+(m-b);}
 
 /* ---- async: load KB from JSON (source of truth), fall back to embedded ---- */
@@ -313,6 +323,7 @@ function monthsSince(ym){if(!ym)return 99;const[a,b]=ym.split('-').map(Number);c
 
 /* ---- browse pills ---- */
 function buildBrowse(){
+  buildSysHues();
   const V=visKB();
   const cats=[...new Set(V.map(r=>r.category))];
   const catEl=document.getElementById('catPills');catEl.innerHTML='';
@@ -324,7 +335,7 @@ function buildBrowse(){
   const systems=[...new Set(V.map(r=>r.system))].sort();
   const sysEl=document.getElementById('sysPills');sysEl.innerHTML='';
   systems.forEach(s=>{const n=V.filter(r=>r.system===s).length;const b=document.createElement('button');b.className='pill';
-    b.innerHTML=`${esc(s)} <span class="ct">${n}</span>`;b.onclick=()=>{activeSys=s;activeCat=null;query="";goResults();};sysEl.appendChild(b);});
+    b.innerHTML=`${sysMono(s)} ${esc(s)} <span class="ct">${n}</span>`;b.onclick=()=>{activeSys=s;activeCat=null;query="";goResults();};sysEl.appendChild(b);});
 }
 buildBrowse();
 
@@ -366,7 +377,7 @@ function renderList(){
   if(!rs.length)h+=`<div style="padding:20px 16px;color:var(--ink-3);font-size:13.5px">No matches. Try fewer words or the Ask AI button above.</div>`;
   rs.forEach(r=>{const ni=(r.images||[]).length;
     h+=`<div class="li${r.id===selId?' sel':''}" data-id="${r.id}">
-      <div class="li-sys">${esc(r.system)}</div>
+      <div class="li-sys">${sysTag(r.system)}</div>
       <div class="li-sym">${hl(r.symptom)}</div>
       <span class="li-type t-${r.type}">${esc(r.type)}</span>${ni?`<span class="li-img">${ni} shot${ni>1?'s':''}</span>`:''}</div>`;});
   L.innerHTML=h;
@@ -382,7 +393,7 @@ function selectRecord(id){
   const lv=r.level||'L1';const mo=monthsSince(r.last_verified);const stale=mo>6;
   const imgs=(r.images||[]);
   document.getElementById('detail').innerHTML=`
-    <div class="d-sys">${esc(r.system)}</div>
+    <div class="d-sys">${sysTag(r.system)}</div>
     <h2>${hl(r.symptom)}</h2>
     <div class="d-meta">
       <span class="lvl-badge lvl-${lv}">${lv}</span>
@@ -518,7 +529,7 @@ function renderDiag(p,q){
   if(p.matches&&p.matches.length){h+=`<div class="ai-h">Matched issues</div>`;
     p.matches.forEach(m=>{const r=byId(m.id);if(!r)return;
       h+=`<div class="ai-match" data-open="${m.id}"><span class="conf conf-${esc(m.confidence||'low')}">${esc(m.confidence||'')}</span>
-        <div><div class="m-sys">${esc(r.system)}</div><div class="m-sym">${esc(r.symptom)}</div>${m.why?`<div class="m-why">${esc(m.why)}</div>`:''}</div></div>`;});}
+        <div><div class="m-sys">${sysTag(r.system)}</div><div class="m-sym">${esc(r.symptom)}</div>${m.why?`<div class="m-why">${esc(m.why)}</div>`:''}</div></div>`;});}
   if(p.steps&&p.steps.length)h+=`<div class="ai-h">Do this now</div><ol class="ai-steps">${p.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`;
   if(p.escalate&&p.escalate!=='none'){
     const tmpl=escalationTemplate(p,q);
