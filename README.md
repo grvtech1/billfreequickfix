@@ -1,7 +1,8 @@
 # BillFree QuickFix — deploy guide
 
-Search-first L1 troubleshooting console with live AI diagnosis. Single Vercel project:
-static front-end + serverless functions. The Anthropic key stays server-side.
+Search-first L1 troubleshooting console with live AI diagnosis (Google Gemini Flash).
+Single Vercel project: static front-end + serverless functions. The Gemini API key stays
+server-side; the proxy is an adapter, so the front-end is provider-agnostic.
 
 ```
 billfree-deploy/
@@ -10,7 +11,7 @@ billfree-deploy/
 │   ├── billfree-kb.json   ← KB source of truth — edit this to update content, no code change
 │   └── kb-images/         ← 133 screenshots, mapped to records
 ├── api/
-│   ├── diagnose.js        ← Anthropic proxy (holds key, rate-limit, optional secret)
+│   ├── diagnose.js        ← Gemini proxy/adapter (holds key, rate-limit, optional secret)
 │   ├── feedback.js        ← 👍/👎 per fix → re-authoring queue
 │   ├── log.js             ← search/open events (zero-result searches = KB gaps)
 │   ├── stats.js           ← read aggregates for the Insights panel
@@ -23,11 +24,14 @@ billfree-deploy/
 ```bash
 npm i -g vercel
 cd billfree-deploy
-vercel                                       # press Enter on "./" for the directory
-vercel env add ANTHROPIC_API_KEY production  # paste key from console.anthropic.com
-vercel --prod                                # redeploy so the key takes effect
+vercel                                    # press Enter on "./" for the directory
+vercel env add GEMINI_API_KEY production  # paste key from aistudio.google.com/apikey
+vercel --prod                             # redeploy so the key takes effect
 ```
 No-CLI path: push to GitHub → import on vercel.com → add the env var under Settings → redeploy.
+
+Optional: set `GEMINI_MODEL` to pin a model (default `gemini-2.0-flash`; e.g. `gemini-2.5-flash`
+for the newer Flash). The proxy reads the key from `GEMINI_API_KEY` (or `GOOGLE_API_KEY`).
 
 ## 2. Turn on Insights + feedback storage (optional, 5 min)
 Without this, the app works fully and every search/feedback event still lands in your
@@ -39,12 +43,14 @@ most-opened fixes, 👎 re-authoring queue):
 
 ## 3. Lock the link (recommended — internal data inside)
 The KB contains internal-only material (the Busy default password, dongle/license steps,
-backend MID checks — these records are flagged `visibility: internal`). The AI endpoint also
-spends your Anthropic credits. Pick one:
+backend MID checks — these records are flagged `visibility: internal`, and are hidden in the
+merchant view: open `/?mode=merchant`). The AI endpoint also spends your Gemini API quota. Pick one:
 - **Vercel password protection** (Pro): Settings → Deployment Protection → Password.
-- **Shared secret** (free): set env `KB_SHARED_SECRET`, then add `"x-kb-secret": "<same value>"`
-  to the headers of the three `fetch()` calls in `index.html` (`/api/diagnose`). The proxy already
-  enforces it when the env var is present, plus a 20-req/min per-IP rate limit.
+- **Shared secret** (free): set env `KB_SHARED_SECRET`, then supply the same value to the client —
+  either set the `KB_SECRET` constant in `index.html` or pass `?k=<same value>` in the URL. The
+  client already attaches it to every `/api` call via `apiHeaders()`; the proxy enforces it when
+  the env var is present, plus a 20-req/min per-IP rate limit. Share merchant links as
+  `/?mode=merchant&k=<secret>`.
 
 ## Updating the KB
 Edit `public/billfree-kb.json` and redeploy — the app fetches it at load. Keep record `id`s

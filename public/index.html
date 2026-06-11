@@ -526,7 +526,7 @@ async function runTurn(displayQ){
   document.getElementById('aiFollow').style.display='none';
   try{
     const res=await fetch("/api/diagnose",{method:"POST",headers:apiHeaders(),
-      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:SYS_PROMPT,messages:convo})});
+      body:JSON.stringify({model:"gemini-flash",max_tokens:1000,system:SYS_PROMPT,messages:convo})});
     const data=await res.json();
     if(!res.ok){turn.querySelector('.ai-think').outerHTML=`<div class="ai-err">${esc(data.error||('Error '+res.status))} — search & guided triage still work fully.</div>`;done();return;}
     const text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join("");
@@ -644,7 +644,7 @@ document.getElementById('insightsBtn').onclick=openInsights;
 (async()=>{
   const s=document.getElementById('status');s.innerHTML='<span class="dot"></span> checking AI…';
   try{
-    const r=await fetch("/api/diagnose",{method:"POST",headers:apiHeaders(),body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:5,messages:[{role:"user",content:"ok"}]})});
+    const r=await fetch("/api/diagnose",{method:"POST",headers:apiHeaders(),body:JSON.stringify({model:"gemini-flash",max_tokens:5,messages:[{role:"user",content:"ok"}]})});
     if(r.ok)s.innerHTML='<span class="ai-on"><span class="dot"></span> AI diagnosis live</span>';
     else s.innerHTML='<span class="ai-off"><span class="dot"></span> AI offline · search &amp; triage active</span>';
   }catch(e){s.innerHTML='<span class="ai-off"><span class="dot"></span> AI offline · search &amp; triage active</span>';}
