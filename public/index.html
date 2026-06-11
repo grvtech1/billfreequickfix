@@ -210,10 +210,16 @@
   .ins-row:last-child{border-bottom:0}
   .ins-row .v{font-family:var(--mono);color:var(--ink-3)}
   .ins-empty{font-size:13px;color:var(--ink-4);padding:6px 0}
-  .lightbox{display:none;position:fixed;inset:0;background:rgba(20,20,18,.86);z-index:100;align-items:center;justify-content:center;padding:30px;cursor:zoom-out}
+  .lightbox{display:none;position:fixed;inset:0;background:rgba(20,20,18,.9);z-index:100;align-items:center;justify-content:center;padding:30px;user-select:none}
   .lightbox.show{display:flex}
-  .lightbox img{max-width:94%;max-height:92%;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-  .lightbox .lb-x{position:absolute;top:20px;right:26px;color:#fff;font-size:34px;cursor:pointer;line-height:1}
+  .lb-stage{max-width:94vw;max-height:90vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .lightbox img{max-width:94vw;max-height:90vh;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.5);transform-origin:center center;cursor:zoom-in;will-change:transform}
+  .lightbox img.zoomed{cursor:grab} .lightbox img.grabbing{cursor:grabbing}
+  .lb-x{position:absolute;top:16px;right:22px;color:#fff;font-size:32px;cursor:pointer;line-height:1;opacity:.85} .lb-x:hover{opacity:1}
+  .lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.13);color:#fff;border:0;font-size:26px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+  .lb-nav:hover{background:rgba(255,255,255,.26)} .lb-prev{left:18px} .lb-next{right:18px}
+  .lb-count{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;font-family:var(--mono);font-size:12.5px;background:rgba(0,0,0,.45);padding:5px 13px;border-radius:20px;letter-spacing:.5px}
+  .lb-hint{position:absolute;bottom:20px;right:22px;color:rgba(255,255,255,.55);font-size:11.5px}
   @media(max-width:760px){
     .pane{grid-template-columns:1fr} .list{max-height:none;border-right:0;border-bottom:1px solid var(--line)}
     .browse,.ins-grid{grid-template-columns:1fr} .hero h1{font-size:32px} .ask span{display:none} .ask{padding:13px 15px}
@@ -277,7 +283,14 @@
   </div>
 </div>
 
-<div class="lightbox" id="lightbox"><span class="lb-x">&times;</span><img id="lbImg" src="" alt="screenshot"></div>
+<div class="lightbox" id="lightbox">
+  <span class="lb-x" id="lbClose">&times;</span>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="previous">&#8249;</button>
+  <div class="lb-stage" id="lbStage"><img id="lbImg" src="" alt="screenshot"></div>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="next">&#8250;</button>
+  <div class="lb-count" id="lbCount"></div>
+  <div class="lb-hint">scroll / double-click to zoom · ← → to move</div>
+</div>
 
 <script>
 
@@ -419,7 +432,8 @@ function selectRecord(id){
   document.getElementById('copyAll').onclick=()=>{const txt=(r.solution||[]).map((s,i)=>`${i+1}. ${s}`).join('\n');copyText(txt,document.getElementById('copyAll'),'Copy all steps','Copied ✓');};
   document.querySelectorAll('.step-copy').forEach(b=>b.onclick=()=>copyText(b.dataset.copy,b,null,null,true));
   // wire screenshots lightbox
-  document.querySelectorAll('.thumb img').forEach(im=>im.closest('.thumb').onclick=()=>openLightbox(im.src));
+  const lbSrcs=imgs.map(im=>im.src);
+  document.querySelectorAll('.thumb img').forEach((im,i)=>im.closest('.thumb').onclick=()=>openLightbox(lbSrcs,i));
   // wire feedback
   document.getElementById('fbUp').onclick=()=>sendFeedback(id,'up');
   document.getElementById('fbDown').onclick=()=>{document.getElementById('fNote').classList.add('show');document.getElementById('fbDown').classList.add('done');};
@@ -439,8 +453,36 @@ function sendFeedback(id,vote,note){
 function openRecordDirect(id){const r=KB.find(x=>x.id===id);if(!r||!isVisible(r))return;activeCat=null;activeSys=null;query="";selId=id;goResults();}
 
 /* ---- lightbox ---- */
-function openLightbox(src){const lb=document.getElementById('lightbox');document.getElementById('lbImg').src=src;lb.classList.add('show');}
-document.getElementById('lightbox').onclick=()=>document.getElementById('lightbox').classList.remove('show');
+let lbList=[], lbIdx=0, lbScale=1, lbX=0, lbY=0, lbDrag=null;
+const lbEl=document.getElementById('lightbox'), lbImg=document.getElementById('lbImg');
+function lbApply(){lbImg.style.transform=`translate(${lbX}px,${lbY}px) scale(${lbScale})`;lbImg.classList.toggle('zoomed',lbScale>1);}
+function lbShow(){
+  lbScale=1;lbX=0;lbY=0;lbDrag=null;lbImg.classList.remove('grabbing');
+  lbImg.src=lbList[lbIdx];lbApply();
+  const multi=lbList.length>1;
+  document.getElementById('lbCount').textContent=multi?`${lbIdx+1} / ${lbList.length}`:'';
+  document.getElementById('lbPrev').style.display=document.getElementById('lbNext').style.display=multi?'':'none';
+}
+function openLightbox(list,idx){lbList=Array.isArray(list)?list:[list];lbIdx=idx||0;lbEl.classList.add('show');lbShow();}
+function lbClose(){lbEl.classList.remove('show');lbList=[];}
+function lbGo(d){if(lbList.length<2)return;lbIdx=(lbIdx+d+lbList.length)%lbList.length;lbShow();}
+function lbZoom(factor,cx,cy){
+  const ns=Math.min(6,Math.max(1,lbScale*factor));if(ns===lbScale)return;
+  const r=lbImg.getBoundingClientRect(),ratio=ns/lbScale;
+  const ux=cx-(r.left+r.width/2-lbX), uy=cy-(r.top+r.height/2-lbY);   // cursor vs untranslated centre
+  lbX=ux*(1-ratio)+lbX*ratio; lbY=uy*(1-ratio)+lbY*ratio; lbScale=ns;
+  if(lbScale<=1){lbScale=1;lbX=0;lbY=0;}
+  lbApply();
+}
+document.getElementById('lbClose').onclick=lbClose;
+document.getElementById('lbPrev').onclick=e=>{e.stopPropagation();lbGo(-1);};
+document.getElementById('lbNext').onclick=e=>{e.stopPropagation();lbGo(1);};
+lbEl.onclick=e=>{if(e.target===lbEl||e.target.id==='lbStage')lbClose();};   // backdrop closes; image/controls don't
+lbImg.addEventListener('wheel',e=>{e.preventDefault();lbZoom(e.deltaY<0?1.18:0.85,e.clientX,e.clientY);},{passive:false});
+lbImg.addEventListener('dblclick',e=>{e.preventDefault();lbScale>1?lbZoom(0.001,e.clientX,e.clientY):lbZoom(2.4,e.clientX,e.clientY);});
+lbImg.addEventListener('mousedown',e=>{if(lbScale<=1)return;e.preventDefault();lbDrag={x:e.clientX,y:e.clientY,ox:lbX,oy:lbY};lbImg.classList.add('grabbing');});
+window.addEventListener('mousemove',e=>{if(!lbDrag)return;lbX=lbDrag.ox+(e.clientX-lbDrag.x);lbY=lbDrag.oy+(e.clientY-lbDrag.y);lbApply();});
+window.addEventListener('mouseup',()=>{if(lbDrag){lbDrag=null;lbImg.classList.remove('grabbing');}});
 
 /* ---- search wiring ---- */
 const heroInput=document.getElementById('heroInput');
@@ -450,10 +492,17 @@ resInput.addEventListener('input',e=>{query=e.target.value.trim();renderList();}
 document.querySelectorAll('.qtile').forEach(q=>q.onclick=()=>openRecordDirect(q.dataset.open));
 document.querySelector('.logo').onclick=goHome;
 document.addEventListener('keydown',e=>{
+  if(lbEl.classList.contains('show')){   // lightbox owns the keyboard while open
+    if(e.key==='ArrowLeft'){e.preventDefault();lbGo(-1);}
+    else if(e.key==='ArrowRight'){e.preventDefault();lbGo(1);}
+    else if(e.key==='+'||e.key==='='){e.preventDefault();lbZoom(1.25,innerWidth/2,innerHeight/2);}
+    else if(e.key==='-'){e.preventDefault();lbZoom(0.8,innerWidth/2,innerHeight/2);}
+    else if(e.key==='Escape')lbClose();
+    return;
+  }
   if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){e.preventDefault();(document.getElementById('results').classList.contains('show')?resInput:heroInput).focus();}
   if(e.key==='Escape'){
-    if(document.getElementById('lightbox').classList.contains('show'))document.getElementById('lightbox').classList.remove('show');
-    else if(document.getElementById('aiModal').classList.contains('show'))closeAI();
+    if(document.getElementById('aiModal').classList.contains('show'))closeAI();
     else if(document.getElementById('treeModal').classList.contains('show'))closeTree();
     else if(document.getElementById('insModal').classList.contains('show'))closeInsights();
     else if(document.getElementById('results').classList.contains('show'))goHome();
