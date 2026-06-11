@@ -1,6 +1,6 @@
 // /api/diagnose.js — Google Gemini proxy/adapter. Key stays server-side.
 // Set GEMINI_API_KEY in Vercel → Settings → Environment Variables.
-// Optional: GEMINI_MODEL (default gemini-2.0-flash), KB_SHARED_SECRET (gate the
+// Optional: GEMINI_MODEL (default gemini-2.5-flash), KB_SHARED_SECRET (gate the
 // endpoint), KV (logs diagnose volume).
 //
 // This is an adapter: it accepts the same {system, messages, max_tokens} shape the
@@ -12,7 +12,7 @@ import { kv, kvReady } from './_kv.js';
 const WINDOW_MS = 60000;
 const MAX_PER_WINDOW = 20;          // per-IP, per minute (per warm instance)
 const hits = new Map();             // ip -> [timestamps]
-const DEFAULT_MODEL = 'gemini-2.0-flash';
+const DEFAULT_MODEL = 'gemini-2.5-flash';
 
 function rateLimited(ip) {
   const now = Date.now();
@@ -58,6 +58,10 @@ export default async function handler(req, res) {
     // Only force strict JSON when there's a system prompt (the real diagnosis path);
     // the lightweight capability probe sends no system and just checks for a 2xx.
     if (system) generationConfig.responseMimeType = 'application/json';
+    // 2.5 models enable "thinking" by default, which spends the output-token budget
+    // and can truncate the JSON. This is a fast KB matcher, not a reasoning task —
+    // disable thinking (only 2.5 supports thinkingConfig; older models would 400).
+    if (model.includes('2.5')) generationConfig.thinkingConfig = { thinkingBudget: 0 };
 
     const body = {
       contents: toGeminiContents(messages),

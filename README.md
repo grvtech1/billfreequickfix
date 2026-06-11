@@ -30,8 +30,9 @@ vercel --prod                             # redeploy so the key takes effect
 ```
 No-CLI path: push to GitHub → import on vercel.com → add the env var under Settings → redeploy.
 
-Optional: set `GEMINI_MODEL` to pin a model (default `gemini-2.0-flash`; e.g. `gemini-2.5-flash`
-for the newer Flash). The proxy reads the key from `GEMINI_API_KEY` (or `GOOGLE_API_KEY`).
+Optional: set `GEMINI_MODEL` to pin a model (default `gemini-2.5-flash`; e.g.
+`gemini-2.5-flash-lite` for lower cost). Note `gemini-2.0-flash` has no free-tier quota on
+many keys. The proxy reads the key from `GEMINI_API_KEY` (or `GOOGLE_API_KEY`).
 
 ## 2. Turn on Insights + feedback storage (optional, 5 min)
 Without this, the app works fully and every search/feedback event still lands in your
