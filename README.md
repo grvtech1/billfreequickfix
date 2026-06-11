@@ -42,16 +42,16 @@ most-opened fixes, 👎 re-authoring queue):
 - Vercel → your project → **Storage → Create / Connect** an Upstash Redis (KV) database.
 - Vercel auto-injects `KV_REST_API_URL` and `KV_REST_API_TOKEN`. Redeploy. Done — no code change.
 
-## 3. Lock the link (recommended — internal data inside)
-The KB contains internal-only material (the Busy default password, dongle/license steps,
-backend MID checks — these records are flagged `visibility: internal`, and are hidden in the
-merchant view: open `/?mode=merchant`). The AI endpoint also spends your Gemini API quota. Pick one:
+## 3. Lock the link (recommended — internal tool)
+This is an internal L1 agent tool: it shows every record, including internal-only material
+(the Busy default password, dongle/license steps, backend MID checks — flagged
+`visibility: internal`). Don't expose it publicly. The AI endpoint also spends your Gemini
+API quota. Pick one:
 - **Vercel password protection** (Pro): Settings → Deployment Protection → Password.
 - **Shared secret** (free): set env `KB_SHARED_SECRET`, then supply the same value to the client —
   either set the `KB_SECRET` constant in `index.html` or pass `?k=<same value>` in the URL. The
   client already attaches it to every `/api` call via `apiHeaders()`; the proxy enforces it when
-  the env var is present, plus a 20-req/min per-IP rate limit. Share merchant links as
-  `/?mode=merchant&k=<secret>`.
+  the env var is present, plus a 20-req/min per-IP rate limit.
 
 ## Updating the KB
 Edit `public/billfree-kb.json` and redeploy — the app fetches it at load. Keep record `id`s

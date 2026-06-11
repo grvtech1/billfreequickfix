@@ -41,16 +41,6 @@
   .insights-link:hover{color:var(--fix-deep)}
   .status{font-size:12.5px;color:var(--ink-3);display:flex;align-items:center;gap:7px}
   .status .ai-on{color:var(--fix-deep)} .status .ai-off{color:var(--warn)}
-  .aud{display:flex;align-items:center;gap:0;background:var(--card);border:1px solid var(--line-2);border-radius:9px;padding:2px}
-  .aud button{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink-3);background:none;border:0;border-radius:7px;padding:5px 11px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.12s}
-  .aud button:hover{color:var(--ink-2)}
-  .aud button.on{background:var(--fix-soft);color:var(--fix-deep)}
-  .aud button.on.pub{background:var(--violet-soft);color:var(--violet)}
-  .aud-lock{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:7px;background:var(--violet-soft);color:var(--violet);display:flex;align-items:center;gap:6px}
-  .aud-banner{max-width:1080px;margin:11px auto 0;padding:0 28px;display:none}
-  .aud-banner.show{display:block}
-  .aud-banner .inner{background:var(--violet-soft);border:1px solid #ddc9ec;border-radius:10px;padding:8px 14px;font-size:12.5px;color:var(--violet);display:flex;align-items:center;gap:8px}
-  .aud-banner .inner svg{flex:none}
   .status .dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
   .hero{padding:50px 0 30px;text-align:center}
   .hero h1{font-family:var(--disp);font-weight:600;font-size:42px;line-height:1.08;letter-spacing:-1.2px;margin:0 0 12px}
@@ -130,9 +120,10 @@
   ol.steps li:hover .step-copy{opacity:1} .step-copy:hover{color:var(--fix-deep);background:var(--fix-soft)}
   .shots{margin-top:24px}
   .shots .d-label{margin-bottom:12px}
-  .shotgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-  .shot{border:1px solid var(--line);border-radius:10px;overflow:hidden;cursor:zoom-in;background:var(--paper);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
-  .shot img{width:100%;height:100%;object-fit:cover;display:block}
+  .shotgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+  .shot{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;cursor:zoom-in;background:var(--card);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
+  .shot img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block}
+  .shot .seq{position:absolute;top:6px;left:6px;z-index:1;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--fix-deep);color:#fff;font-family:var(--mono);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.3)}
   .tags{margin-top:24px;padding-top:18px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:7px}
   .tg{font-size:11px;font-family:var(--mono);color:var(--ink-3);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:3px 8px}
   .feedback{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
@@ -231,15 +222,10 @@
 <div class="topbar">
   <div class="logo"><div class="mark"></div><div><b>BillFree <span>QuickFix</span></b><small>L1 Troubleshooting · KB v2.2</small></div></div>
   <div class="topright">
-    <div class="aud" id="audToggle" title="Agent view shows everything; Merchant view hides internal-only records (passwords, dongle/license, backend MID checks)">
-      <button id="audAgent" data-aud="internal"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Agent</button>
-      <button id="audMerchant" data-aud="public"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l1-5h16l1 5M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 13h6"/></svg>Merchant</button>
-    </div>
     <button class="insights-link" id="insightsBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg>Insights</button>
     <div class="status" id="status"></div>
   </div>
 </div>
-<div class="aud-banner" id="audBanner"><div class="inner"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span><b>Merchant self-serve view</b> — internal-only records (default passwords, dongle/license steps, backend MID checks) are hidden, and the AI is grounded only on merchant-safe content.</span></div></div>
 
 <div id="landing">
   <div class="wrap">
@@ -300,17 +286,9 @@ const TODAY="2026-06";
 function indexAll(){KB.forEach(r=>r._idx=(r.symptom+" "+r.cause+" "+r.system+" "+(r.solution||[]).join(" ")+" "+(r.tags||[]).join(" ")).toLowerCase());}
 indexAll();
 
-/* ---- audience gating ----------------------------------------------------
-   'internal' = support agents (default; sees every record).
-   'public'   = merchant self-serve (records with visibility:"internal" are
-   hidden everywhere AND withheld from the AI grounding context).
-   A ?mode=merchant (or ?audience=public) URL param LOCKS the view to public
-   and hides the toggle — that is the link you share with merchants. */
-const AUD_LOCK=(()=>{const p=new URLSearchParams(location.search);const m=(p.get('mode')||p.get('audience')||'').toLowerCase();
-  if(m==='merchant'||m==='public')return 'public';if(m==='agent'||m==='internal')return 'internal';return null;})();
-let audience=AUD_LOCK||localStorage.getItem('bf_audience')||'internal';
-function isVisible(r){return audience==='internal'||(r.visibility||'public')!=='internal';}
-function visKB(){return KB.filter(isVisible);}
+/* Single internal (agent) view — every record is shown. */
+function isVisible(r){return true;}
+function visKB(){return KB;}
 
 let query="", activeCat=null, activeSys=null, selId=null, shownId=null;
 const esc=s=>(s||"").replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
@@ -348,28 +326,6 @@ function buildBrowse(){
     b.innerHTML=`${esc(s)} <span class="ct">${n}</span>`;b.onclick=()=>{activeSys=s;activeCat=null;query="";goResults();};sysEl.appendChild(b);});
 }
 buildBrowse();
-
-/* ---- audience toggle wiring ---- */
-function setAudience(a){
-  audience=AUD_LOCK||((a==='public')?'public':'internal');
-  if(!AUD_LOCK){try{localStorage.setItem('bf_audience',audience);}catch(e){}}
-  const ag=document.getElementById('audAgent'),mc=document.getElementById('audMerchant');
-  if(ag&&mc){ag.classList.toggle('on',audience==='internal');mc.classList.toggle('on',audience==='public');mc.classList.toggle('pub',audience==='public');}
-  const ban=document.getElementById('audBanner');if(ban)ban.classList.toggle('show',audience==='public');
-  buildBrowse();
-  if(selId){const r=KB.find(x=>x.id===selId);if(r&&!isVisible(r))selId=null;}
-  if(document.getElementById('results').classList.contains('show')){activeCat=null;activeSys=null;renderList();}
-}
-(function initAudience(){
-  const tog=document.getElementById('audToggle');
-  if(AUD_LOCK){
-    tog.outerHTML='<div class="aud-lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'+(AUD_LOCK==='public'?'Merchant view':'Agent view')+'</div>';
-  }else{
-    document.getElementById('audAgent').onclick=()=>setAudience('internal');
-    document.getElementById('audMerchant').onclick=()=>setAudience('public');
-  }
-  setAudience(audience);
-})();
 
 function filtered(){
   let rs=visKB().filter(r=>(!activeCat||r.category===activeCat)&&(!activeSys||r.system===activeSys));
@@ -420,7 +376,7 @@ function selectRecord(id){
     ${r.cause?`<div class="cause"><b>Likely cause</b>${hl(r.cause)}</div>`:''}
     <div class="d-label">Resolution<span class="ln"></span><button class="copyall" id="copyAll"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy all steps</button></div>
     <ol class="steps">${(r.solution||[]).map((s,i)=>`<li>${hl(s)}<button class="step-copy" data-copy="${esc(s)}" aria-label="copy step"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></li>`).join('')}</ol>
-    ${imgs.length?`<div class="shots"><div class="d-label">Screenshots<span class="ln"></span></div><div class="shotgrid">${imgs.map(im=>`<div class="shot"><img loading="lazy" src="${esc(im.src)}" alt="${esc(im.caption||r.symptom)}" onerror="this.closest('.shot').style.display='none'"></div>`).join('')}</div></div>`:''}
+    ${imgs.length?`<div class="shots"><div class="d-label">Screenshots${imgs.length>1?` · ${imgs.length} in sequence`:''}<span class="ln"></span></div><div class="shotgrid">${imgs.map((im,i)=>`<div class="shot"><span class="seq">${i+1}</span><img loading="lazy" src="${esc(im.src)}" alt="${esc(im.caption||(r.symptom+' — step '+(i+1)))}" onerror="this.closest('.shot').style.display='none'"></div>`).join('')}</div></div>`:''}
     ${(r.tags&&r.tags.length)?`<div class="tags">${r.tags.map(t=>`<span class="tg">${esc(t)}</span>`).join('')}</div>`:''}
     <div class="feedback" id="fb">
       <div class="fq">Did this resolve the issue?</div>
