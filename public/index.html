@@ -312,7 +312,7 @@ let audience=AUD_LOCK||localStorage.getItem('bf_audience')||'internal';
 function isVisible(r){return audience==='internal'||(r.visibility||'public')!=='internal';}
 function visKB(){return KB.filter(isVisible);}
 
-let query="", activeCat=null, activeSys=null, selId=null;
+let query="", activeCat=null, activeSys=null, selId=null, shownId=null;
 const esc=s=>(s||"").replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
 function hl(t){if(!query)return esc(t);const re=new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig');return esc(t).replace(re,'<mark>$1</mark>');}
 /* Optional API gate. To protect a shared (merchant) link from API-key abuse, set
@@ -398,11 +398,12 @@ function renderList(){
       <span class="li-type t-${r.type}">${esc(r.type)}</span>${ni?`<span class="li-img">${ni} shot${ni>1?'s':''}</span>`:''}</div>`;});
   L.innerHTML=h;
   L.querySelectorAll('.li').forEach(li=>li.onclick=()=>selectRecord(li.dataset.id));
-  if(rs.length&&!rs.find(r=>r.id===selId))selectRecord(rs[0].id);
-  else if(!rs.length)document.getElementById('detail').innerHTML='<div class="d-empty">No issue selected.</div>';
+  if(!rs.length){shownId=null;document.getElementById('detail').innerHTML='<div class="d-empty">No issue selected.</div>';}
+  else if(!rs.find(r=>r.id===selId))selectRecord(rs[0].id);   // selection gone → fall back to first
+  else if(selId!==shownId)selectRecord(selId);                // selection chosen elsewhere (tile/deeplink) → sync detail
 }
 function selectRecord(id){
-  selId=id;const r=KB.find(x=>x.id===id);if(!r)return;
+  const r=KB.find(x=>x.id===id);if(!r)return;selId=id;shownId=id;
   post('/api/log',{event:'open',id});
   document.querySelectorAll('.li').forEach(li=>li.classList.toggle('sel',li.dataset.id===id));
   const lv=r.level||'L1';const mo=monthsSince(r.last_verified);const stale=mo>6;
