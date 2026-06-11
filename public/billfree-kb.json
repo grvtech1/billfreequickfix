@@ -83,11 +83,11 @@
       "level": "L1",
       "images": [
         {
-          "src": "kb-images/setup-config-popup-1.jpg",
+          "src": "kb-images/setup-config-popup-2.jpg",
           "caption": ""
         },
         {
-          "src": "kb-images/setup-config-popup-2.jpg",
+          "src": "kb-images/setup-config-popup-1.jpg",
           "caption": ""
         }
       ],
@@ -495,15 +495,15 @@
           "caption": ""
         },
         {
-          "src": "kb-images/tally-billtransfer-7.jpg",
-          "caption": ""
-        },
-        {
           "src": "kb-images/tally-billtransfer-8.jpg",
           "caption": ""
         },
         {
           "src": "kb-images/tally-billtransfer-9.jpg",
+          "caption": ""
+        },
+        {
+          "src": "kb-images/tally-billtransfer-7.jpg",
           "caption": ""
         },
         {
@@ -543,11 +543,11 @@
       "level": "L1",
       "images": [
         {
-          "src": "kb-images/tally-api-tdl-1.jpg",
+          "src": "kb-images/tally-api-tdl-2.jpg",
           "caption": ""
         },
         {
-          "src": "kb-images/tally-api-tdl-2.jpg",
+          "src": "kb-images/tally-api-tdl-1.jpg",
           "caption": ""
         },
         {
@@ -555,7 +555,7 @@
           "caption": ""
         },
         {
-          "src": "kb-images/tally-api-tdl-4.jpg",
+          "src": "kb-images/tally-api-tdl-6.jpg",
           "caption": ""
         },
         {
@@ -563,7 +563,7 @@
           "caption": ""
         },
         {
-          "src": "kb-images/tally-api-tdl-6.jpg",
+          "src": "kb-images/tally-api-tdl-4.jpg",
           "caption": ""
         },
         {
@@ -655,11 +655,11 @@
       "level": "L1",
       "images": [
         {
-          "src": "kb-images/gofrugal2-select-1.jpg",
+          "src": "kb-images/gofrugal2-select-2.jpg",
           "caption": ""
         },
         {
-          "src": "kb-images/gofrugal2-select-2.jpg",
+          "src": "kb-images/gofrugal2-select-1.jpg",
           "caption": ""
         },
         {
@@ -696,11 +696,11 @@
       "level": "L1",
       "images": [
         {
-          "src": "kb-images/marg-config-1.jpg",
+          "src": "kb-images/marg-config-2.jpg",
           "caption": ""
         },
         {
-          "src": "kb-images/marg-config-2.jpg",
+          "src": "kb-images/marg-config-1.jpg",
           "caption": ""
         }
       ],
@@ -914,10 +914,6 @@
           "caption": ""
         },
         {
-          "src": "kb-images/wizapp-phase1-2.jpg",
-          "caption": ""
-        },
-        {
           "src": "kb-images/wizapp-phase1-3.jpg",
           "caption": ""
         },
@@ -951,6 +947,10 @@
         },
         {
           "src": "kb-images/wizapp-phase1-11.jpg",
+          "caption": ""
+        },
+        {
+          "src": "kb-images/wizapp-phase1-2.jpg",
           "caption": ""
         }
       ],
@@ -1129,11 +1129,11 @@
           "caption": ""
         },
         {
-          "src": "kb-images/acme-printer-2.jpg",
+          "src": "kb-images/acme-printer-3.jpg",
           "caption": ""
         },
         {
-          "src": "kb-images/acme-printer-3.jpg",
+          "src": "kb-images/acme-printer-2.jpg",
           "caption": ""
         },
         {
@@ -1247,10 +1247,6 @@
       "level": "L1",
       "images": [
         {
-          "src": "kb-images/zoho-api-1.jpg",
-          "caption": ""
-        },
-        {
           "src": "kb-images/zoho-api-2.jpg",
           "caption": ""
         },
@@ -1271,10 +1267,6 @@
           "caption": ""
         },
         {
-          "src": "kb-images/zoho-api-7.jpg",
-          "caption": ""
-        },
-        {
           "src": "kb-images/zoho-api-8.jpg",
           "caption": ""
         },
@@ -1288,6 +1280,14 @@
         },
         {
           "src": "kb-images/zoho-api-11.jpg",
+          "caption": ""
+        },
+        {
+          "src": "kb-images/zoho-api-7.jpg",
+          "caption": ""
+        },
+        {
+          "src": "kb-images/zoho-api-1.jpg",
           "caption": ""
         }
       ],
@@ -1485,7 +1485,7 @@
           "caption": ""
         },
         {
-          "src": "kb-images/busy-api-bcd-4.jpg",
+          "src": "kb-images/busy-api-bcd-6.jpg",
           "caption": ""
         },
         {
@@ -1493,7 +1493,7 @@
           "caption": ""
         },
         {
-          "src": "kb-images/busy-api-bcd-6.jpg",
+          "src": "kb-images/busy-api-bcd-4.jpg",
           "caption": ""
         },
         {
@@ -1549,19 +1549,19 @@
       "level": "L1",
       "images": [
         {
-          "src": "kb-images/busy-api-billship-1.jpg",
-          "caption": ""
-        },
-        {
           "src": "kb-images/busy-api-billship-2.jpg",
           "caption": ""
         },
         {
-          "src": "kb-images/busy-api-billship-3.jpg",
+          "src": "kb-images/busy-api-billship-1.jpg",
           "caption": ""
         },
         {
           "src": "kb-images/busy-api-billship-4.jpg",
+          "caption": ""
+        },
+        {
+          "src": "kb-images/busy-api-billship-3.jpg",
           "caption": ""
         }
       ],
@@ -1598,11 +1598,11 @@
           "caption": ""
         },
         {
-          "src": "kb-images/busy-api-vsg-3.jpg",
+          "src": "kb-images/busy-api-vsg-4.jpg",
           "caption": ""
         },
         {
-          "src": "kb-images/busy-api-vsg-4.jpg",
+          "src": "kb-images/busy-api-vsg-3.jpg",
           "caption": ""
         }
       ],
