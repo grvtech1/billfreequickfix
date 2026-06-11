@@ -283,7 +283,7 @@ const META = {"version": "2.2", "updated": "2026-06"};
 let KB = EMBEDDED_KB;
 const TYPE_ORDER={error:0,printing:1,howto:2,setup:3,reference:4};
 const TODAY="2026-06";
-function indexAll(){KB.forEach(r=>r._idx=(r.symptom+" "+r.cause+" "+r.system+" "+(r.solution||[]).join(" ")+" "+(r.tags||[]).join(" ")).toLowerCase());}
+function indexAll(){KB.forEach(r=>r._idx=(r.symptom+" "+(r.cause||"")+" "+r.system+" "+(r.solution||[]).join(" ")+" "+(r.tags||[]).join(" ")).toLowerCase());}
 indexAll();
 
 /* Single internal (agent) view — every record is shown. */
@@ -292,7 +292,7 @@ function visKB(){return KB;}
 
 let query="", activeCat=null, activeSys=null, selId=null, shownId=null;
 const esc=s=>(s||"").replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-function hl(t){if(!query)return esc(t);const re=new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig');return esc(t).replace(re,'<mark>$1</mark>');}
+function hl(t){if(!query)return esc(t);const terms=queryTerms().map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));if(!terms.length)return esc(t);const re=new RegExp('('+terms.join('|')+')','ig');return esc(t).replace(re,'<mark>$1</mark>');}
 /* Optional API gate. To protect a shared (merchant) link from API-key abuse, set
    KB_SHARED_SECRET in Vercel and put the SAME value here (or pass ?k=SECRET in the
    URL). Empty = endpoint open. This is a deterrent for casual abuse, not strong
@@ -327,9 +327,25 @@ function buildBrowse(){
 }
 buildBrowse();
 
+function queryTerms(){return query.toLowerCase().split(/\s+/).filter(t=>t.length>1);}
 function filtered(){
   let rs=visKB().filter(r=>(!activeCat||r.category===activeCat)&&(!activeSys||r.system===activeSys));
-  if(query){const q=query.toLowerCase();rs=rs.filter(r=>r._idx.includes(q));}
+  const terms=query?queryTerms():[];
+  if(terms.length){
+    // score each record by how many distinct query words it contains, then keep only the
+    // best-matching tier (so "busy api integration" returns the busy-api records, not every
+    // record that merely contains "api"). Ties broken by symptom hits, then type.
+    const scored=rs.map(r=>{
+      let m=0;for(const t of terms)if(r._idx.includes(t))m++;
+      let s=0;const sym=r.symptom.toLowerCase();for(const t of terms)if(sym.includes(t))s++;
+      return {r,m,s};
+    }).filter(x=>x.m>0);
+    if(!scored.length)return [];
+    const best=Math.max(...scored.map(x=>x.m));
+    return scored.filter(x=>x.m===best)
+      .sort((a,b)=>b.s-a.s||(TYPE_ORDER[a.r.type]??9)-(TYPE_ORDER[b.r.type]??9))
+      .map(x=>x.r);
+  }
   return rs.sort((a,b)=>(TYPE_ORDER[a.type]??9)-(TYPE_ORDER[b.type]??9));
 }
 function goResults(){
