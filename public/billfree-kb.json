@@ -25,12 +25,7 @@
         "setup"
       ],
       "level": "L1",
-      "images": [
-        {
-          "src": "kb-images/setup-universal-1.jpg",
-          "caption": ""
-        }
-      ],
+      "images": [],
       "last_verified": "2026-05",
       "visibility": "public"
     },
@@ -83,15 +78,11 @@
       "level": "L1",
       "images": [
         {
-          "src": "kb-images/setup-config-popup-2.jpg",
-          "caption": ""
-        },
-        {
           "src": "kb-images/setup-config-popup-1.jpg",
           "caption": ""
         },
         {
-          "src": "kb-images/setup-config-popup-3.jpg",
+          "src": "kb-images/setup-config-popup-2.jpg",
           "caption": ""
         }
       ],
@@ -242,7 +233,16 @@
         "select"
       ],
       "level": "L1",
-      "images": [],
+      "images": [
+        {
+          "src": "kb-images/busy-select-printer-1.jpg",
+          "caption": ""
+        },
+        {
+          "src": "kb-images/busy-select-printer-2.jpg",
+          "caption": ""
+        }
+      ],
       "last_verified": "2026-05",
       "visibility": "public"
     },
@@ -1667,16 +1667,7 @@
         "alt+3"
       ],
       "level": "L1",
-      "images": [
-        {
-          "src": "kb-images/busy-api-discount-1.jpg",
-          "caption": ""
-        },
-        {
-          "src": "kb-images/busy-api-discount-2.jpg",
-          "caption": ""
-        }
-      ],
+      "images": [],
       "last_verified": "2026-05",
       "visibility": "public"
     },
@@ -1709,6 +1700,10 @@
       "images": [
         {
           "src": "kb-images/busy-api-digitalbill-1.jpg",
+          "caption": ""
+        },
+        {
+          "src": "kb-images/busy-api-digitalbill-2.jpg",
           "caption": ""
         }
       ],
