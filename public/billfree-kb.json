@@ -89,6 +89,10 @@
         {
           "src": "kb-images/setup-config-popup-1.jpg",
           "caption": ""
+        },
+        {
+          "src": "kb-images/setup-config-popup-3.jpg",
+          "caption": ""
         }
       ],
       "last_verified": "2026-05",
@@ -151,7 +155,12 @@
         "sms"
       ],
       "level": "L1",
-      "images": [],
+      "images": [
+        {
+          "src": "kb-images/popup-delivery-options-1.jpg",
+          "caption": ""
+        }
+      ],
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
@@ -320,16 +329,7 @@
         "standard"
       ],
       "level": "L1",
-      "images": [
-        {
-          "src": "kb-images/busy-mobile-field-1.jpg",
-          "caption": ""
-        },
-        {
-          "src": "kb-images/busy-mobile-field-2.jpg",
-          "caption": ""
-        }
-      ],
+      "images": [],
       "last_verified": "2026-05",
       "visibility": "public"
     },
@@ -655,15 +655,19 @@
       "level": "L1",
       "images": [
         {
-          "src": "kb-images/gofrugal2-select-2.jpg",
-          "caption": ""
-        },
-        {
           "src": "kb-images/gofrugal2-select-1.jpg",
           "caption": ""
         },
         {
+          "src": "kb-images/gofrugal2-select-2.jpg",
+          "caption": ""
+        },
+        {
           "src": "kb-images/gofrugal2-select-3.jpg",
+          "caption": ""
+        },
+        {
+          "src": "kb-images/gofrugal2-select-4.jpg",
           "caption": ""
         }
       ],
@@ -1040,16 +1044,7 @@
         "printer"
       ],
       "level": "L1",
-      "images": [
-        {
-          "src": "kb-images/monark-select-1.jpg",
-          "caption": ""
-        },
-        {
-          "src": "kb-images/monark-select-2.jpg",
-          "caption": ""
-        }
-      ],
+      "images": [],
       "last_verified": "2026-05",
       "visibility": "public"
     },
@@ -1074,7 +1069,12 @@
         "printer type"
       ],
       "level": "L1",
-      "images": [],
+      "images": [
+        {
+          "src": "kb-images/eshopaid-identify-1.jpg",
+          "caption": ""
+        }
+      ],
       "last_verified": "2026-05",
       "visibility": "public"
     },
