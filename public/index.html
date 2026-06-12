@@ -112,14 +112,23 @@
   .d-label .ln{flex:1;height:1px;background:var(--line)}
   .copyall{font-family:var(--sans);font-size:11px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--ink-3);background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:4px 9px;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
   .copyall:hover{border-color:var(--fix);color:var(--fix-deep)}
-  ol.steps{counter-reset:s;list-style:none;margin:0;padding:0}
-  ol.steps li{counter-increment:s;position:relative;padding:0 36px 18px 42px;font-size:14.5px;color:var(--ink-2);line-height:1.6}
+  ol.steps{list-style:none;margin:0;padding:0}
+  ol.steps li{position:relative;padding:0 36px 18px 42px;font-size:14.5px;color:var(--ink-2);line-height:1.6}
   ol.steps li:last-child{padding-bottom:0}
-  ol.steps li::before{content:counter(s);position:absolute;left:0;top:-1px;width:27px;height:27px;border-radius:8px;background:var(--fix-soft);color:var(--fix-deep);
-    font-family:var(--mono);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+  .step-check{position:absolute;left:0;top:-1px;width:27px;height:27px;border-radius:8px;background:var(--fix-soft);color:var(--fix-deep);border:1px solid transparent;
+    font-family:var(--mono);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:.12s;z-index:1}
+  .step-check:hover{border-color:var(--fix)}
+  .step-check .chk{display:none}
+  ol.steps li.done .step-check{background:var(--fix-deep);color:#fff}
+  ol.steps li.done .step-check .n{display:none}
+  ol.steps li.done .step-check .chk{display:block}
+  ol.steps li.done .step-txt{color:var(--ink-4);text-decoration:line-through;text-decoration-color:var(--line-2)}
   ol.steps li:not(:last-child)::after{content:"";position:absolute;left:13px;top:30px;bottom:6px;width:1px;background:var(--line)}
   .step-copy{position:absolute;right:0;top:0;background:none;border:0;color:var(--ink-4);cursor:pointer;padding:3px;border-radius:6px;opacity:0;transition:.12s}
   ol.steps li:hover .step-copy{opacity:1} .step-copy:hover{color:var(--fix-deep);background:var(--fix-soft)}
+  .step-prog{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink-4);text-transform:none;letter-spacing:0}
+  .step-prog.complete{color:var(--fix-deep)}
+  .copyall.wa svg{color:#25D366} .copyall.wa:hover{border-color:#25D366;color:#0e7a52}
   .shots{margin-top:24px}
   .shots .d-label{margin-bottom:12px}
   .shotseq{display:flex;flex-direction:column;gap:14px}
@@ -415,8 +424,8 @@ function selectRecord(id){
       ${r.last_verified?`<span class="verified${stale?' stale':''}">${stale?'⚠ not verified in '+mo+' mo':'✓ verified '+esc(r.last_verified)}</span>`:''}
     </div>
     ${r.cause?`<div class="cause"><b>Likely cause</b>${hl(r.cause)}</div>`:''}
-    <div class="d-label">Resolution<span class="ln"></span><button class="copyall" id="copyAll"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy all steps</button></div>
-    <ol class="steps">${(r.solution||[]).map((s,i)=>`<li>${hl(s)}<button class="step-copy" data-copy="${esc(s)}" aria-label="copy step"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></li>`).join('')}</ol>
+    <div class="d-label">Resolution<span class="step-prog" id="stepProg"></span><span class="ln"></span><button class="copyall wa" id="waCopy"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.4 5 5.2-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.8c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.1-.2 0-.4.1-.5l.4-.5c.1-.1.1-.3 0-.4l-.7-1.7c-.2-.4-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3a3 3 0 0 0-.9 2.2c0 1.3 1 2.6 1.1 2.8.1.2 1.9 2.9 4.6 4 .6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1z"/></svg>WhatsApp</button><button class="copyall" id="copyAll"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy all steps</button></div>
+    <ol class="steps">${(r.solution||[]).map((s,i)=>`<li><button class="step-check" aria-label="mark step ${i+1} done"><span class="n">${i+1}</span><svg class="chk" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m20 6-11 11-5-5"/></svg></button><span class="step-txt">${hl(s)}</span><button class="step-copy" data-copy="${esc(s)}" aria-label="copy step"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></li>`).join('')}</ol>
     ${imgs.length?`<div class="shots"><div class="d-label">Screenshots${imgs.length>1?` · ${imgs.length} in sequence`:''}<span class="ln"></span></div><div class="shotseq">${imgs.map((im,i)=>`<div class="shotrow"><span class="seq">${i+1}</span><div class="thumb"><img loading="lazy" src="${esc(im.src)}" alt="${esc(im.caption||(r.symptom+' — step '+(i+1)))}" onerror="this.closest('.shotrow').style.display='none'"></div></div>`).join('')}</div></div>`:''}
     ${(r.tags&&r.tags.length)?`<div class="tags">${r.tags.map(t=>`<span class="tg">${esc(t)}</span>`).join('')}</div>`:''}
     <div class="feedback" id="fb">
@@ -429,8 +438,17 @@ function selectRecord(id){
     </div>`;
   document.querySelector('.detail').scrollTop=0;
   // wire copy
-  document.getElementById('copyAll').onclick=()=>{const txt=(r.solution||[]).map((s,i)=>`${i+1}. ${s}`).join('\n');copyText(txt,document.getElementById('copyAll'),'Copy all steps','Copied ✓');};
+  document.getElementById('copyAll').onclick=()=>{const txt=(r.solution||[]).map((s,i)=>`${i+1}. ${s}`).join('\n');copyText(txt,document.getElementById('copyAll'),null,'Copied ✓');};
   document.querySelectorAll('.step-copy').forEach(b=>b.onclick=()=>copyText(b.dataset.copy,b,null,null,true));
+  document.getElementById('waCopy').onclick=()=>copyText(waMessage(r),document.getElementById('waCopy'),null,'Copied ✓');
+  // step checkboxes + live progress (resets naturally on record change — detail re-renders)
+  const stepCount=(r.solution||[]).length;
+  const progEl=document.getElementById('stepProg');
+  const updProg=()=>{const done=document.querySelectorAll('ol.steps li.done').length;
+    progEl.textContent=stepCount?`${done}/${stepCount} done`:'';
+    progEl.classList.toggle('complete',stepCount>0&&done===stepCount);};
+  document.querySelectorAll('ol.steps li').forEach(li=>li.querySelector('.step-check').onclick=()=>{li.classList.toggle('done');updProg();});
+  updProg();
   // wire screenshots lightbox
   const lbSrcs=imgs.map(im=>im.src);
   document.querySelectorAll('.thumb img').forEach((im,i)=>im.closest('.thumb').onclick=()=>openLightbox(lbSrcs,i));
@@ -438,6 +456,13 @@ function selectRecord(id){
   document.getElementById('fbUp').onclick=()=>sendFeedback(id,'up');
   document.getElementById('fbDown').onclick=()=>{document.getElementById('fNote').classList.add('show');document.getElementById('fbDown').classList.add('done');};
   document.getElementById('fNoteSend').onclick=()=>sendFeedback(id,'down',document.getElementById('fNoteText').value.trim());
+}
+function waMessage(r){
+  // Merchant-facing WhatsApp message: bold issue heading + numbered steps + sign-off.
+  const lines=['*'+(r.symptom||'BillFree fix')+'*',''];
+  (r.solution||[]).forEach((s,i)=>lines.push((i+1)+'. '+s));
+  lines.push('','_Reply here if it still does not work — happy to help further._');
+  return lines.join('\n');
 }
 function copyText(txt,btn,defLabel,okLabel,iconOnly){
   navigator.clipboard.writeText(txt).then(()=>{
