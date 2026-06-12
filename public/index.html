@@ -23,7 +23,7 @@
     --mono:'SFMono-Regular',ui-monospace,'Cascadia Code',Consolas,monospace;
   }
   *{box-sizing:border-box}
-  html,body{margin:0}
+  html,body{margin:0;overflow-x:hidden}
   body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;
     background-image:radial-gradient(circle at 85% -5%,rgba(15,169,104,.05),transparent 38%);min-height:100vh}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -97,7 +97,9 @@
   .t-error{background:var(--err-soft);color:var(--err)} .t-printing{background:var(--warn-soft);color:var(--warn)}
   .t-howto{background:var(--info-soft);color:var(--info)} .t-setup{background:var(--violet-soft);color:var(--violet)}
   .t-reference{background:#eee;color:var(--ink-3)}
-  .detail{padding:30px 34px;overflow-y:auto;max-height:78vh}
+  .detail{padding:30px 34px;overflow-y:auto;max-height:78vh;overflow-wrap:break-word}
+  .d-back{display:none;align-items:center;gap:7px;background:none;border:0;cursor:pointer;color:var(--ink-2);font-family:var(--sans);font-size:13.5px;font-weight:600;padding:0 0 16px}
+  .d-back:hover{color:var(--fix-deep)}
   .detail .d-sys{font-size:12px;font-family:var(--mono);color:var(--fix-deep);letter-spacing:.5px;text-transform:uppercase}
   .detail h2{font-family:var(--disp);font-weight:600;font-size:25px;line-height:1.18;letter-spacing:-.5px;margin:7px 0 4px}
   .d-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-3);margin-bottom:20px}
@@ -244,9 +246,23 @@
   .lb-nav:hover{background:rgba(255,255,255,.26)} .lb-prev{left:18px} .lb-next{right:18px}
   .lb-count{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;font-family:var(--mono);font-size:12.5px;background:rgba(0,0,0,.45);padding:5px 13px;border-radius:20px;letter-spacing:.5px}
   .lb-hint{position:absolute;bottom:20px;right:22px;color:rgba(255,255,255,.55);font-size:11.5px}
+  @media(max-width:980px){ .pane{grid-template-columns:300px 1fr} }
   @media(max-width:760px){
-    .pane{grid-template-columns:1fr} .list{max-height:none;border-right:0;border-bottom:1px solid var(--line)}
-    .browse,.ins-grid{grid-template-columns:1fr} .hero h1{font-size:32px} .ask span{display:none} .ask{padding:13px 15px}
+    .wrap{padding:0 16px} .topbar{padding:16px 16px 0;flex-wrap:wrap;gap:10px} .topright{gap:13px} .status{font-size:11.5px}
+    .hero{padding:30px 0 22px} .hero h1{font-size:30px} .hero p{font-size:15px}
+    .searchbox{padding:6px 6px 6px 15px} .searchbox input{font-size:16px}
+    .ask span{display:none} .ask{padding:13px 15px}
+    .browse,.ins-grid{grid-template-columns:1fr}
+    .results{padding:14px 0 40px}
+    /* single-pane master -> detail: list and detail swap, never stacked */
+    .pane{grid-template-columns:1fr;min-height:0;border-radius:12px}
+    .list{max-height:none;border-right:0;border-bottom:0}
+    .detail{display:none;max-height:none;padding:18px 18px}
+    .detail h2{font-size:22px} .detail .d-meta{margin-bottom:16px}
+    .pane.show-detail .list{display:none}
+    .pane.show-detail .detail{display:block}
+    .d-back{display:inline-flex}
+    .zero{padding:22px 6px} .shotseq{gap:10px}
   }
 </style>
 </head>
@@ -444,10 +460,15 @@ function renderNoResults(){
   d.querySelectorAll('.zero-sug button').forEach(b=>b.onclick=()=>openRecordDirect(b.dataset.id));
   d.querySelectorAll('.zero-chip').forEach(b=>b.onclick=()=>{activeCat=b.dataset.cat;activeSys=null;query="";goResults();});
 }
+// ---- mobile master->detail nav (no-op on desktop, where CSS shows both panes) ----
+const paneEl=document.querySelector('.pane');
+function paneList(){paneEl&&paneEl.classList.remove('show-detail');}
+function paneDetail(){paneEl&&paneEl.classList.add('show-detail');}
 function goResults(){
   document.getElementById('landing').style.display='none';
   document.getElementById('results').classList.add('show');
   document.getElementById('resInput').value=query;
+  paneList();                 // mobile: entering results lands on the list (overridden by openRecordDirect)
   renderList();window.scrollTo(0,0);
 }
 function goHome(){document.getElementById('results').classList.remove('show');document.getElementById('landing').style.display='';selId=null;closeAI();}
@@ -465,8 +486,8 @@ function renderList(){
       <div class="li-sym">${hl(r.symptom)}</div>
       <span class="li-type t-${r.type}">${esc(r.type)}</span>${ni?`<span class="li-img">${ni} shot${ni>1?'s':''}</span>`:''}</div>`;});
   L.innerHTML=h;
-  L.querySelectorAll('.li').forEach(li=>li.onclick=()=>selectRecord(li.dataset.id));
-  if(!rs.length){shownId=null;if(query)renderNoResults();else document.getElementById('detail').innerHTML='<div class="d-empty">No issues in this view.</div>';}
+  L.querySelectorAll('.li').forEach(li=>li.onclick=()=>{selectRecord(li.dataset.id);paneDetail();});  // mobile: tap a result → open its fix
+  if(!rs.length){shownId=null;if(query){renderNoResults();paneDetail();}else document.getElementById('detail').innerHTML='<div class="d-empty">No issues in this view.</div>';}
   else if(!rs.find(r=>r.id===selId))selectRecord(rs[0].id);   // selection gone → fall back to first
   else if(selId!==shownId)selectRecord(selId);                // selection chosen elsewhere (tile/deeplink) → sync detail
 }
@@ -477,6 +498,7 @@ function selectRecord(id){
   const lv=r.level||'L1';const mo=monthsSince(r.last_verified);const stale=mo>6;
   const imgs=(r.images||[]);
   document.getElementById('detail').innerHTML=`
+    <button class="d-back" id="dBack"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>All results</button>
     <div class="d-sys">${sysTag(r.system)}</div>
     <h2>${hl(r.symptom)}</h2>
     <div class="d-meta">
@@ -499,6 +521,7 @@ function selectRecord(id){
       <div class="fnote" id="fNote"><textarea id="fNoteText" placeholder="What was different? (optional — goes to the re-authoring queue)"></textarea><button id="fNoteSend">Send</button></div>
     </div>`;
   document.querySelector('.detail').scrollTop=0;
+  document.getElementById('dBack').onclick=paneList;   // mobile: back to the results list
   // wire copy
   document.getElementById('copyAll').onclick=()=>{const txt=(r.solution||[]).map((s,i)=>`${i+1}. ${s}`).join('\n');copyText(txt,document.getElementById('copyAll'),null,'Copied ✓');};
   document.querySelectorAll('.step-copy').forEach(b=>b.onclick=()=>copyText(b.dataset.copy,b,null,null,true));
@@ -537,7 +560,7 @@ function sendFeedback(id,vote,note){
   const fb=document.getElementById('fb');
   fb.innerHTML=`<div class="fthanks">${vote==='up'?'✓ Logged — thanks. This helps surface the fixes that actually work.':'✓ Logged to the re-authoring queue. A maintainer will review this fix.'}</div>`;
 }
-function openRecordDirect(id){const r=KB.find(x=>x.id===id);if(!r||!isVisible(r))return;activeCat=null;activeSys=null;query="";selId=id;goResults();}
+function openRecordDirect(id){const r=KB.find(x=>x.id===id);if(!r||!isVisible(r))return;activeCat=null;activeSys=null;query="";selId=id;goResults();paneDetail();}
 
 /* ---- lightbox ---- */
 let lbList=[], lbIdx=0, lbScale=1, lbX=0, lbY=0, lbDrag=null;
@@ -575,7 +598,7 @@ window.addEventListener('mouseup',()=>{if(lbDrag){lbDrag=null;lbImg.classList.re
 const heroInput=document.getElementById('heroInput');
 heroInput.addEventListener('keydown',e=>{if(e.key==='Enter'){query=heroInput.value.trim();activeCat=activeSys=null;goResults();}});
 const resInput=document.getElementById('resInput');
-resInput.addEventListener('input',e=>{query=e.target.value.trim();renderList();});
+resInput.addEventListener('input',e=>{query=e.target.value.trim();paneList();renderList();});
 document.querySelectorAll('.qtile').forEach(q=>q.onclick=()=>openRecordDirect(q.dataset.open));
 document.querySelector('.logo').onclick=goHome;
 document.addEventListener('keydown',e=>{
