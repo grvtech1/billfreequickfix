@@ -152,6 +152,21 @@
   .fthanks{font-size:13px;color:var(--fix-deep);margin-top:8px}
   code{font-family:var(--mono);font-size:13px;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--ink)}
   .d-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-4);font-size:14px;text-align:center;padding:40px}
+  .zero{padding:40px 34px;max-width:540px;margin:0 auto}
+  .zero h3{font-size:18px;color:var(--ink);margin:0 0 7px;font-weight:600;line-height:1.4}
+  .zero h3 q{color:var(--fix-deep);font-style:normal}
+  .zero p{color:var(--ink-3);font-size:13.5px;margin:0 0 22px;line-height:1.55}
+  .zero-ai{display:inline-flex;align-items:center;gap:8px;background:var(--fix-deep);color:#fff;border:0;border-radius:10px;padding:12px 19px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:.12s}
+  .zero-ai:hover{filter:brightness(1.08)} .zero-ai svg{flex:none}
+  .zero-sec{margin-top:28px}
+  .zero-sec .h{font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:var(--ink-4);font-weight:600;margin-bottom:12px}
+  .zero-sug{display:flex;flex-direction:column;gap:8px}
+  .zero-sug button{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 13px;cursor:pointer;font-family:var(--sans);transition:.12s;display:flex;align-items:center;gap:11px}
+  .zero-sug button:hover{border-color:var(--fix);background:var(--fix-soft)}
+  .zero-sug .s-sym{font-size:13.5px;color:var(--ink-2);line-height:1.4}
+  .zero-chips{display:flex;flex-wrap:wrap;gap:7px}
+  .zero-chip{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:6px 13px;font-size:12.5px;color:var(--ink-2);cursor:pointer;font-family:var(--sans);transition:.12s}
+  .zero-chip:hover{border-color:var(--fix);color:var(--fix-deep)}
   mark{background:#fdeebd;border-radius:2px;padding:0 1px;color:var(--ink)}
   .ai-modal,.tree-modal,.insights-modal{display:none}
   .ai-modal.show,.tree-modal.show,.insights-modal.show{display:block}
@@ -382,6 +397,53 @@ function filtered(){
   }
   return rs.sort((a,b)=>(TYPE_ORDER[a.type]??9)-(TYPE_ORDER[b.type]??9));
 }
+// ---- zero-result helper: typo-tolerant "did you mean" + Ask-AI handoff ----
+let KB_VOCAB=null;
+function kbVocab(){
+  if(KB_VOCAB)return KB_VOCAB;
+  const set=new Set();
+  visKB().forEach(r=>(r._idx||'').split(/[^a-z0-9]+/).forEach(w=>{if(w.length>=3)set.add(w);}));
+  KB_VOCAB=[...set];return KB_VOCAB;
+}
+function lev(a,b){ // bounded edit distance; bail early when lengths are far apart
+  const m=a.length,n=b.length;if(Math.abs(m-n)>2)return 3;
+  let prev=Array.from({length:n+1},(_,i)=>i),cur=new Array(n+1);
+  for(let i=1;i<=m;i++){cur[0]=i;
+    for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    [prev,cur]=[cur,prev];}
+  return prev[n];
+}
+function fuzzyTokens(term){
+  const tol=term.length>=6?2:(term.length>=4?1:0);
+  return kbVocab().filter(w=>w.includes(term)||term.includes(w)||(tol&&lev(term,w)<=tol));
+}
+function nearMatches(){
+  const terms=queryTerms();if(!terms.length)return [];
+  const expanded=terms.map(fuzzyTokens);
+  const pool=visKB().filter(r=>(!activeCat||r.category===activeCat)&&(!activeSys||r.system===activeSys));
+  const scored=pool.map(r=>{
+    let m=0;for(const toks of expanded)if(toks.some(w=>(r._idx||'').includes(w)))m++;
+    return {r,m};
+  }).filter(x=>x.m>0);
+  return scored.sort((a,b)=>b.m-a.m||(TYPE_ORDER[a.r.type]??9)-(TYPE_ORDER[b.r.type]??9))
+    .slice(0,5).map(x=>x.r);
+}
+function renderNoResults(){
+  const near=nearMatches();
+  const cats=[...new Set(visKB().map(r=>r.category))];
+  const q=query||'';
+  let h=`<div class="zero">
+    <h3>No exact match for <q>${esc(q)}</q></h3>
+    <p>Keyword search came up empty. Describe the merchant's situation in plain words and let AI diagnose it against the whole knowledge base — it can connect symptoms that don't share the exact wording.</p>
+    <button class="zero-ai" id="zeroAi"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2z"/></svg>Ask AI about this</button>`;
+  if(near.length)
+    h+=`<div class="zero-sec"><div class="h">Closest fixes</div><div class="zero-sug">${near.map(r=>`<button data-id="${esc(r.id)}">${sysMono(r.system)}<span class="s-sym">${esc(r.symptom)}</span></button>`).join('')}</div></div>`;
+  h+=`<div class="zero-sec"><div class="h">Or browse by area</div><div class="zero-chips">${cats.map(c=>`<button class="zero-chip" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}</div></div></div>`;
+  const d=document.getElementById('detail');d.innerHTML=h;
+  document.getElementById('zeroAi').onclick=()=>openAI(q);
+  d.querySelectorAll('.zero-sug button').forEach(b=>b.onclick=()=>openRecordDirect(b.dataset.id));
+  d.querySelectorAll('.zero-chip').forEach(b=>b.onclick=()=>{activeCat=b.dataset.cat;activeSys=null;query="";goResults();});
+}
 function goResults(){
   document.getElementById('landing').style.display='none';
   document.getElementById('results').classList.add('show');
@@ -396,7 +458,7 @@ function renderList(){
   let scope=activeCat||activeSys||(query?`"${query}"`:'All issues');
   if(query) post('/api/log',{event:'search',q:query,results:rs.length});
   let h=`<div class="lcount">${rs.length} ${rs.length===1?'result':'results'} · ${esc(scope)}</div>`;
-  if(!rs.length)h+=`<div style="padding:20px 16px;color:var(--ink-3);font-size:13.5px">No matches. Try fewer words or the Ask AI button above.</div>`;
+  if(!rs.length)h+=`<div style="padding:20px 16px;color:var(--ink-3);font-size:13.5px">No keyword match — see suggestions on the right.</div>`;
   rs.forEach(r=>{const ni=(r.images||[]).length;
     h+=`<div class="li${r.id===selId?' sel':''}" data-id="${r.id}">
       <div class="li-sys">${sysTag(r.system)}</div>
@@ -404,7 +466,7 @@ function renderList(){
       <span class="li-type t-${r.type}">${esc(r.type)}</span>${ni?`<span class="li-img">${ni} shot${ni>1?'s':''}</span>`:''}</div>`;});
   L.innerHTML=h;
   L.querySelectorAll('.li').forEach(li=>li.onclick=()=>selectRecord(li.dataset.id));
-  if(!rs.length){shownId=null;document.getElementById('detail').innerHTML='<div class="d-empty">No issue selected.</div>';}
+  if(!rs.length){shownId=null;if(query)renderNoResults();else document.getElementById('detail').innerHTML='<div class="d-empty">No issues in this view.</div>';}
   else if(!rs.find(r=>r.id===selId))selectRecord(rs[0].id);   // selection gone → fall back to first
   else if(selId!==shownId)selectRecord(selId);                // selection chosen elsewhere (tile/deeplink) → sync detail
 }
