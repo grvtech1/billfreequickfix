@@ -1,5 +1,5 @@
 {
-  "version": "2.2",
+  "version": "2.3",
   "updated": "2026-06",
   "audience": "L1 Technical Support",
   "records": [
@@ -1817,6 +1817,51 @@
       "images": [],
       "last_verified": "2026-05",
       "visibility": "public"
+    },
+    {
+      "id": "ci-cash-drawer",
+      "category": "Common Issue",
+      "system": "Printer",
+      "type": "printing",
+      "symptom": "Cash drawer not opening after BillFree integration (opens fine on direct / native print)",
+      "cause": "BillFree captures the POS print as XPS (a graphical format) and forwards a rendered copy to the thermal printer. Raw ESC/POS control codes embedded in the original print — including the cash-drawer 'kick' (ESC p / 1B 70) — are not preserved in XPS, so the forwarded print never triggers the drawer. Direct (non-BillFree) printing kept those codes, which is why the drawer opened before. The drawer must therefore be opened at the printer-driver level so it fires on the forwarded job.",
+      "solution": [
+        "Fix (confirmed): open the cash drawer at the printer-driver level so it fires on every forwarded print, independent of any POS command.",
+        "Control Panel > Devices and Printers > right-click the thermal printer (e.g. POS-80) > Printer Properties.",
+        "Advanced tab > 'Printing Defaults...' — set it HERE (device-level). BillFree forwards from a background context that uses Printing Defaults, not the current user's Printing Preferences; setting it only in Preferences is the usual reason it still fails.",
+        "Open the Peripheral / Cash Drawer tab > set 'Open Drawer #1: After printing' (or Before printing) > Apply. Repeat the same in Printing Preferences for safety.",
+        "Confirm BillFree's Forward Print target is this exact thermal printer (the one wired to the drawer) — not the HP/BillFree virtual printer or any other printer.",
+        "Test a bill via 'BillFree + Print' — the drawer should now open.",
+        "If the Cash Drawer / Peripheral tab is missing: a generic driver is installed. Install the proper 80mm thermal driver (which exposes a Peripheral/Cash Drawer tab), then repeat.",
+        "POS-provider note: no change is needed on the POS side if they use the default Windows print path and rely on the driver's cash-drawer property (most do). Only if the POS sends a custom direct-port kick must they target the physical printer port directly, outside the BillFree/XPS path."
+      ],
+      "tags": [
+        "cash drawer",
+        "drawer",
+        "cash-drawer",
+        "open drawer after printing",
+        "pos-80",
+        "pos 80",
+        "thermal printer",
+        "esc/pos",
+        "drawer kick",
+        "printing defaults",
+        "forward print",
+        "printer driver",
+        "universal",
+        "restaurant pos",
+        "dart"
+      ],
+      "level": "L1",
+      "images": [],
+      "last_verified": "2026-06",
+      "visibility": "public",
+      "related": [
+        "setup-printing-types",
+        "popup-delivery-options",
+        "setup-universal",
+        "ci-printer-props"
+      ]
     },
     {
       "id": "ci-0x709",
