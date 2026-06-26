@@ -1,5 +1,5 @@
 {
-  "version": "2.4",
+  "version": "2.5",
   "updated": "2026-06",
   "audience": "L1 Technical Support",
   "records": [
@@ -1904,6 +1904,52 @@
         "setup-printing-types",
         "ci-a5-portrait",
         "marg-a4instead3"
+      ]
+    },
+    {
+      "id": "ci-pagesize-a5",
+      "category": "Common Issue",
+      "system": "Printer",
+      "type": "printing",
+      "symptom": "A5 invoice format prints incorrectly / fails via BillFree (clipping, rotation, truncation) unless both BillFree and the physical printer have the correct multi-level page-size settings",
+      "cause": "An A5 invoice routed through BillFree needs the page size set at TWO levels on BOTH printers: the General (main) page size = A5, and the Advanced / Capture (logical) page size = A4. If the Advanced/Capture size is left wrong (or only the General size is set), BillFree captures or scales the bill incorrectly, producing clipping, rotation, or truncation on the A5 output.",
+      "solution": [
+        "An A5 invoice through BillFree must be configured at two levels on BOTH the BillFree virtual printer AND the physical printer — General page size = A5, Advanced/Capture (logical) page size = A4.",
+        "Reference -> POS: A5 | BillFree virtual printer: General A5, Advanced/Capture A4 | Physical customer printer: General A5, Advanced/Capture A4.",
+        "On the merchant PC, open Printer Properties > BillFree Printer > General tab > set Page Size = A5.",
+        "In BillFree Printer > Advanced (or Device Settings) tab > set the capture / logical page size = A4.",
+        "Open the Physical Customer Printer properties > General tab > set Page Size = A5.",
+        "In the Physical Printer > Advanced tab > set the capture / logical page size = A4.",
+        "Save settings and reboot the BillFree service (or ask the merchant to run BillFree Reset) if needed.",
+        "Print a test invoice from the POS and confirm correct output on A5 paper (no clipping, rotation, or truncation).",
+        "Document the result in the ticket and attach a photo of the printed A5 bill."
+      ],
+      "tags": [
+        "a5",
+        "a4",
+        "page size",
+        "pagesize",
+        "general tab",
+        "advanced tab",
+        "capture",
+        "logical page size",
+        "device settings",
+        "clipping",
+        "rotation",
+        "truncation",
+        "invoice format",
+        "billfree reset",
+        "printing"
+      ],
+      "level": "L1",
+      "images": [],
+      "last_verified": "2026-06",
+      "visibility": "public",
+      "related": [
+        "ci-pagesize-a4a5",
+        "setup-config-popup",
+        "setup-printing-types",
+        "ci-a5-portrait"
       ]
     },
     {
