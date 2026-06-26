@@ -335,7 +335,7 @@
     },
     {
       "id": "busy-email",
-      "category": "POS Integration",
+      "category": "Email Integration",
       "system": "Busy",
       "type": "setup",
       "symptom": "How to configure Busy Email (Gmail) integration",
