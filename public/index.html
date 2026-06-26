@@ -281,6 +281,10 @@
   .sa-pill{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:13px;color:var(--ink-2);cursor:pointer;transition:.12s;font-family:var(--sans);text-align:left}
   .sa-pill:hover{border-color:var(--fix);background:var(--fix-tint)}
   @media(max-width:760px){.step-copy{opacity:.35}}
+  /* list group headers (shown when browsing by system or by category) */
+  .list-grp{font-size:10.5px;letter-spacing:.65px;text-transform:uppercase;color:var(--ink-3);font-weight:700;padding:10px 16px 4px;background:var(--paper);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:1}
+  .list-grp:first-child{padding-top:8px}
+  .list-grp-ct{font-family:var(--mono);font-size:10px;font-weight:400;background:var(--card);border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--ink-4);letter-spacing:0;text-transform:none}
 </style>
 </head>
 <body>
@@ -492,22 +496,32 @@ function goResults(){
 function goHome(){document.getElementById('results').classList.remove('show');document.getElementById('landing').style.display='';selId=null;closeAI();}
 document.getElementById('backBtn').onclick=goHome;
 
+function renderLi(r){
+  const ni=(r.images||[]).length;
+  return `<div class="li${r.id===selId?' sel':''}" data-id="${r.id}">
+      <div class="li-sys">${sysTag(r.system)}</div>
+      <div class="li-sym">${hl(r.symptom)}</div>
+      <span class="li-type t-${r.type}">${esc(r.type)}</span>${ni?`<span class="li-img">${ni} shot${ni>1?'s':''}</span>`:''}</div>`;
+}
 function renderList(){
   const rs=filtered();const L=document.getElementById('list');
   let scope=activeCat||activeSys||(query?`"${query}"`:'All issues');
-  if(query) post('/api/log',{event:'search',q:query,results:rs.length});
+  if(query)post('/api/log',{event:'search',q:query,results:rs.length});
   let h=`<div class="lcount">${rs.length} ${rs.length===1?'result':'results'} · ${esc(scope)}</div>`;
   if(!rs.length)h+=`<div style="padding:20px 16px;color:var(--ink-3);font-size:13.5px">No keyword match — see suggestions on the right.</div>`;
-  rs.forEach(r=>{const ni=(r.images||[]).length;
-    h+=`<div class="li${r.id===selId?' sel':''}" data-id="${r.id}">
-      <div class="li-sys">${sysTag(r.system)}</div>
-      <div class="li-sym">${hl(r.symptom)}</div>
-      <span class="li-type t-${r.type}">${esc(r.type)}</span>${ni?`<span class="li-img">${ni} shot${ni>1?'s':''}</span>`:''}</div>`;});
+  // group by category when browsing a system; group by system when browsing a category
+  const grpKey=!query&&activeSys?'category':(!query&&activeCat?'system':null);
+  if(grpKey&&rs.length){
+    const order=[];const groups={};
+    rs.forEach(r=>{const k=r[grpKey]||'Other';if(!groups[k]){groups[k]=[];order.push(k);}groups[k].push(r);});
+    if(order.length>1)order.forEach(g=>{h+=`<div class="list-grp">${esc(g)}<span class="list-grp-ct">${groups[g].length}</span></div>`;groups[g].forEach(r=>h+=renderLi(r));});
+    else rs.forEach(r=>h+=renderLi(r));
+  }else rs.forEach(r=>h+=renderLi(r));
   L.innerHTML=h;
-  L.querySelectorAll('.li').forEach(li=>li.onclick=()=>{selectRecord(li.dataset.id);paneDetail();});  // mobile: tap a result → open its fix
+  L.querySelectorAll('.li').forEach(li=>li.onclick=()=>{selectRecord(li.dataset.id);paneDetail();});
   if(!rs.length){shownId=null;if(query){renderNoResults();paneDetail();}else document.getElementById('detail').innerHTML='<div class="d-empty">No issues in this view.</div>';}
-  else if(!rs.find(r=>r.id===selId))selectRecord(rs[0].id);   // selection gone → fall back to first
-  else if(selId!==shownId)selectRecord(selId);                // selection chosen elsewhere (tile/deeplink) → sync detail
+  else if(!rs.find(r=>r.id===selId))selectRecord(rs[0].id);
+  else if(selId!==shownId)selectRecord(selId);
 }
 function selectRecord(id){
   const r=KB.find(x=>x.id===id);if(!r)return;selId=id;shownId=id;
