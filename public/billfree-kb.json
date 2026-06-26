@@ -1,5 +1,5 @@
 {
-  "version": "2.5",
+  "version": "2.6",
   "updated": "2026-06",
   "audience": "L1 Technical Support",
   "records": [
@@ -1950,6 +1950,48 @@
         "setup-config-popup",
         "setup-printing-types",
         "ci-a5-portrait"
+      ]
+    },
+    {
+      "id": "ci-print-cutoff",
+      "category": "Common Issue",
+      "system": "Printer",
+      "type": "printing",
+      "symptom": "Invoice (A4 or A5) printed via BillFree is cut off at the bottom — some content missing — even though the POS and printer report the correct page size",
+      "cause": "The printer's effective printable area is slightly smaller than the document layout expects, so the last lines of the bill fall outside the printable region and get clipped. The page size 'matches' on paper, but the usable print area does not fully cover the document height.",
+      "solution": [
+        "Fix = create or select a CUSTOM paper size with a slightly increased length (height) so the document content fits within the printable region.",
+        "Add the custom size via Print Server Properties (Control Panel > Devices and Printers > select any printer > Print Server Properties > Forms tab > tick 'Create a new form', name it, set the size) — or via the printer's Windows Printer Properties.",
+        "Example custom sizes -> A4 standard: 8.27 x 11.69 in | A4 extended (custom): 8.27 x 11.80 in (adds ~0.11 in to prevent the bottom cut).",
+        "For A5, apply a similar small increase to the height (e.g. A5 height + 0.10 to 0.15 in).",
+        "Select this custom paper size on BOTH the BillFree virtual printer and the physical printer (and in the POS print format if it lets you pick the paper).",
+        "Print a test invoice and confirm the full bill prints with no bottom cut-off; adjust the extra height slightly if a little content still clips."
+      ],
+      "tags": [
+        "bottom cut",
+        "cut off",
+        "cutoff",
+        "cut at bottom",
+        "custom paper size",
+        "printable area",
+        "form",
+        "print server",
+        "a4",
+        "a5",
+        "margin",
+        "truncated",
+        "missing content",
+        "height",
+        "printing"
+      ],
+      "level": "L1",
+      "images": [],
+      "last_verified": "2026-06",
+      "visibility": "public",
+      "related": [
+        "ci-pagesize-a4a5",
+        "ci-pagesize-a5",
+        "setup-config-popup"
       ]
     },
     {
