@@ -1,5 +1,5 @@
 {
-  "version": "2.3",
+  "version": "2.4",
   "updated": "2026-06",
   "audience": "L1 Technical Support",
   "records": [
@@ -1861,6 +1861,49 @@
         "popup-delivery-options",
         "setup-universal",
         "ci-printer-props"
+      ]
+    },
+    {
+      "id": "ci-pagesize-a4a5",
+      "category": "Common Issue",
+      "system": "Printer",
+      "type": "printing",
+      "symptom": "A4 invoice prints fine directly from POS but is misaligned / cut / distorted when routed through BillFree (POS format A4, customer paper A5)",
+      "cause": "BillFree's virtual printer intercepts the print job and processes it based on ITS OWN configured page size. If the BillFree printer is set to A5 (to match the physical paper) while the POS invoice format is A4, BillFree tries to scale/squeeze the A4 layout into A5 during interception — causing misalignment, cutting, or distortion. Printing directly from the POS works because no interception/rescaling happens.",
+      "solution": [
+        "Fix = split page-size configuration: the BillFree virtual printer must match the POS invoice FORMAT, while the physical printer matches the actual PAPER.",
+        "Set the BillFree virtual printer page size to A4 — it MUST match the POS invoice/bill format so the bill is captured accurately, with no scaling at interception. (Devices and Printers > BillFree printer > Printing Preferences/Properties > Page Size = A4.)",
+        "Keep the physical customer printer set to A5 (its real paper size). The printer hardware then does the final A4 -> A5 scaling and produces a correct A5 print.",
+        "Quick reference -> POS Invoice Format: A4 | BillFree Virtual Printer Page Size: A4 (match POS format) | Physical Customer Printer Page Size: A5 (actual paper).",
+        "Rule of thumb: BillFree's page size always matches the POS invoice FORMAT (not the paper); the physical printer matches the PAPER. A mismatch at the BillFree layer is what breaks the layout.",
+        "Verify: print a test bill via 'BillFree + Print' and confirm alignment is correct on the A5 output."
+      ],
+      "tags": [
+        "a4",
+        "a5",
+        "paper size",
+        "page size",
+        "pagesize",
+        "scaling",
+        "misalignment",
+        "cut",
+        "cutting",
+        "distortion",
+        "invoice format",
+        "bill format",
+        "virtual printer",
+        "page setup",
+        "printing"
+      ],
+      "level": "L1",
+      "images": [],
+      "last_verified": "2026-06",
+      "visibility": "public",
+      "related": [
+        "setup-config-popup",
+        "setup-printing-types",
+        "ci-a5-portrait",
+        "marg-a4instead3"
       ]
     },
     {
