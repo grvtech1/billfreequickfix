@@ -512,10 +512,15 @@ function renderList(){
   // group by category when browsing a system; group by system when browsing a category
   const grpKey=!query&&activeSys?'category':(!query&&activeCat?'system':null);
   if(grpKey&&rs.length){
+    // sort by KB insertion order (author's intended sequence) rather than type-score
+    const kbPos=Object.fromEntries(KB.map((r,i)=>[r.id,i]));
+    const byKb=arr=>arr.slice().sort((a,b)=>kbPos[a.id]-kbPos[b.id]);
     const order=[];const groups={};
     rs.forEach(r=>{const k=r[grpKey]||'Other';if(!groups[k]){groups[k]=[];order.push(k);}groups[k].push(r);});
-    if(order.length>1)order.forEach(g=>{h+=`<div class="list-grp">${esc(g)}<span class="list-grp-ct">${groups[g].length}</span></div>`;groups[g].forEach(r=>h+=renderLi(r));});
-    else rs.forEach(r=>h+=renderLi(r));
+    // sort groups themselves by position of their earliest KB record
+    order.sort((a,b)=>Math.min(...groups[a].map(r=>kbPos[r.id]))-Math.min(...groups[b].map(r=>kbPos[r.id])));
+    if(order.length>1)order.forEach(g=>{h+=`<div class="list-grp">${esc(g)}<span class="list-grp-ct">${groups[g].length}</span></div>`;byKb(groups[g]).forEach(r=>h+=renderLi(r));});
+    else byKb(rs).forEach(r=>h+=renderLi(r));
   }else rs.forEach(r=>h+=renderLi(r));
   L.innerHTML=h;
   L.querySelectorAll('.li').forEach(li=>li.onclick=()=>{selectRecord(li.dataset.id);paneDetail();});
