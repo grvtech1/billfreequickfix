@@ -1,5 +1,5 @@
 {
-  "version": "2.6",
+  "version": "2.7",
   "updated": "2026-06",
   "audience": "L1 Technical Support",
   "records": [
@@ -2099,7 +2099,7 @@
       "id": "ci-a5-portrait",
       "category": "Common Issue",
       "system": "Printing",
-      "type": "error",
+      "type": "printing",
       "symptom": "Web POS on Chrome using A5 landscape, but digital bill shows A5 portrait",
       "cause": "Browser rendering/config issue.",
       "solution": [
