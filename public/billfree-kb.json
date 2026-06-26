@@ -445,7 +445,7 @@
     },
     {
       "id": "tally-billtransfer",
-      "category": "POS Integration",
+      "category": "Setup Utility",
       "system": "Tally",
       "type": "setup",
       "symptom": "How to install Tally BillTransfer utility",
