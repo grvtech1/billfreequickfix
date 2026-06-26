@@ -796,7 +796,12 @@
         "billfree setup exe"
       ],
       "level": "L1",
-      "images": [],
+      "images": [
+        {
+          "src": "kb-images/marg-api-1.jpg",
+          "caption": "Complete 15-step BillFree activation guide for Marg ERP — from file download to final restart"
+        }
+      ],
       "last_verified": "2026-06",
       "visibility": "public"
     },
