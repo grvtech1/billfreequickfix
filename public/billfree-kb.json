@@ -11,8 +11,9 @@
       "symptom": "How does the Universal Setup Utility work / how to install it",
       "cause": "The Universal Utility installs a 'BillFree' virtual printer that intercepts the POS print job, parses it via XPS, writes a PDF + JSON pair into C:\\BillFree\\Data, and uploads them to the BillFree server for WhatsApp + SMS delivery. Because it works at the Windows print layer, it integrates with ANY POS that can print an invoice — no POS-specific plugin needed.",
       "solution": [
-        "Prerequisites: Windows 7/8/10/11; an ACTIVE Merchant ID (MID) from the BillFree backend; the merchant's POS able to print invoices; .NET Framework 4.5 installed (grab it from the same portal page if missing).",
-        "Log in to the BillFree merchant portal (billfree.in). Open your store from the left menu; the store panel shows Store details and Active Features. Click 'Download Integration Files'.",
+        "Prerequisites: complete merchant onboarding first so an ACTIVE Merchant ID (MID) exists (see onboarding). Also need Windows 7/8/10/11, the merchant's POS able to print invoices, and .NET Framework 4.5 (grab it from the same portal page if missing).",
+        "Log in to the BillFree merchant portal (billfree.in) with the merchant's credentials. You land on the Home dashboard ('Business at a Glance').",
+        "Open the Merchant Profile (top-left profile / My Account). It shows Business Details, Store details and Active Features. At the bottom, click 'Download Integration Files'.",
         "On the Integration Files page, download 'BillFree Universal Utility'. This is the BillFreeUniversalSetup Vxx.msi installer (e.g. V10.6). If the PC lacks .NET Framework 4.5, download and install that FIRST from the same page.",
         "The MSI downloads (e.g. BillFreeUniversalSetup V10.6.msi). Open it to launch the installer.",
         "The 'Welcome to the BillFree Setup Wizard' appears — click Next and complete the wizard with the default options.",
@@ -20,7 +21,7 @@
         "Inside C:\\BillFree you'll see the working folders: Data (uploaded PDF+JSON invoices), Doc, Support (printer install scripts), and Temp.",
         "Install the virtual printer driver: open C:\\BillFree\\Support and run the script that matches the OS — InstallPrinter_Win10.bat for Windows 10/11 (use InstallPrinter_Win7.bat on Windows 7). Right-click > Run as administrator.",
         "The script runs rundll32 printui.dll,PrintUIEntry commands: it removes any old 'BillFree' printer, installs the bundled HP driver (from the x64/x86 subfolder), renames it to 'BillFree', and binds it to port lpt1:. Let the command window finish.",
-        "Optional helpers in the same Support folder: run SetBillFreeDefaultPrinter.bat to make BillFree the default Windows printer, and SetCustomPaperSize.bat if a custom paper size is needed.",
+        "In the same Support folder, run SetBillFreeDefaultPrinter.bat to make BillFree the default Windows printer (run SetCustomPaperSize.bat too if a custom paper size is needed).",
         "Open the BillFree Configuration screen and set: Folder Path = C:\\BillFree\\Data; Merchant ID = the merchant's MID (e.g. 28669); Target Printer = BillFree; Print Options = tick 'BillFree' and 'BillFree + Print'; Forward Print Job = Yes with Fwd Target Printer = the customer's physical printer. Leave the rest at defaults (Enable Logging = Yes, AutoPrintMode = Yes, PDF Mode = Auto). Click Save.",
         "Done. The utility now intercepts every print, converts it to PDF + JSON into C:\\BillFree\\Data, and uploads to the server — the customer receives the digital bill via WhatsApp + SMS. Verify with a test print (see appendix-checklist)."
       ],
@@ -41,48 +42,53 @@
       "images": [
         {
           "src": "kb-images/setup-universal-1.png",
-          "caption": "Step 2 — In the merchant portal, open your store and click 'Download Integration Files' (Store details & Active Features shown here)."
+          "caption": "Step 2 — After login you land on the Home dashboard ('Business at a Glance')."
         },
         {
           "src": "kb-images/setup-universal-2.png",
-          "caption": "Step 3 — Integration Files page: download 'BillFree Universal Utility' (and .NET Framework 4.5 if not already installed)."
+          "caption": "Step 3 — Open the Merchant Profile: Business & Store details plus Active Features. Click 'Download Integration Files'."
         },
         {
           "src": "kb-images/setup-universal-3.png",
-          "caption": "Step 4 — The installer downloads (e.g. BillFreeUniversalSetup V10.6.msi). Open it to begin."
+          "caption": "Step 4 — Integration Files page: download 'BillFree Universal Utility' (and .NET Framework 4.5 if not already installed)."
         },
         {
           "src": "kb-images/setup-universal-4.png",
-          "caption": "Step 5 — BillFree Setup Wizard welcome screen. Click Next and finish with defaults."
+          "caption": "Step 5 — The installer downloads (e.g. BillFreeUniversalSetup V10.6.msi). Open it to begin."
         },
         {
           "src": "kb-images/setup-universal-5.png",
-          "caption": "Step 6 — After install, the BillFree folder appears on Local Disk (C:)."
+          "caption": "Step 6 — BillFree Setup Wizard welcome screen. Click Next and finish with defaults."
         },
         {
           "src": "kb-images/setup-universal-6.png",
-          "caption": "Step 7 — Inside C:\\BillFree: Data, Doc, Support and Temp working folders."
+          "caption": "Step 7 — After install, the BillFree folder appears on Local Disk (C:)."
         },
         {
           "src": "kb-images/setup-universal-7.png",
-          "caption": "Step 8 — C:\\BillFree\\Support: run InstallPrinter_Win10.bat (or _Win7 on Windows 7) as administrator."
+          "caption": "Step 8 — Inside C:\\BillFree: Data, Doc, Support and Temp working folders."
         },
         {
           "src": "kb-images/setup-universal-8.png",
-          "caption": "Step 9 — The script runs rundll32 printui.dll commands to install the HP driver, rename it 'BillFree', and bind it to lpt1:."
+          "caption": "Step 9 — C:\\BillFree\\Support: run InstallPrinter_Win10.bat (or _Win7 on Windows 7) as administrator."
         },
         {
           "src": "kb-images/setup-universal-9.png",
-          "caption": "Step 10 — Optional: SetBillFreeDefaultPrinter.bat makes BillFree the default Windows printer."
+          "caption": "Step 10 — The script runs rundll32 printui.dll commands to install the HP driver, rename it 'BillFree', and bind it to lpt1:."
         },
         {
           "src": "kb-images/setup-universal-10.png",
-          "caption": "Step 11 — BillFree Configuration: set Folder Path, Merchant ID (28669), Target Printer = BillFree, tick BillFree + Print, Forward Print Job = Yes, then Save."
+          "caption": "Step 11 — Run SetBillFreeDefaultPrinter.bat to make BillFree the default Windows printer."
+        },
+        {
+          "src": "kb-images/setup-universal-11.png",
+          "caption": "Step 12 — BillFree Configuration: set Folder Path, Merchant ID (28669), Target Printer = BillFree, tick BillFree + Print, Forward Print Job = Yes, then Save."
         }
       ],
       "last_verified": "2026-07",
       "visibility": "public",
       "related": [
+        "onboarding",
         "setup-flow",
         "setup-config-popup",
         "setup-printing-types",
