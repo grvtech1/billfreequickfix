@@ -22,7 +22,7 @@
         "Install the virtual printer driver: open C:\\BillFree\\Support and run the script that matches the OS — InstallPrinter_Win10.bat for Windows 10/11 (use InstallPrinter_Win7.bat on Windows 7). Right-click > Run as administrator.",
         "The script runs rundll32 printui.dll,PrintUIEntry commands: it removes any old 'BillFree' printer, installs the bundled HP driver (from the x64/x86 subfolder), renames it to 'BillFree', and binds it to port lpt1:. Let the command window finish.",
         "In the same Support folder, run SetBillFreeDefaultPrinter.bat to make BillFree the default Windows printer (run SetCustomPaperSize.bat too if a custom paper size is needed).",
-        "Open the BillFree Configuration screen and set: Folder Path = C:\\BillFree\\Data; Merchant ID = the merchant's MID (e.g. 28669); Target Printer = BillFree; Print Options = tick 'BillFree' and 'BillFree + Print'; Forward Print Job = Yes with Fwd Target Printer = the customer's physical printer. Leave the rest at defaults (Enable Logging = Yes, AutoPrintMode = Yes, PDF Mode = Auto). Click Save.",
+        "Open the BillFree Configuration screen and set: Folder Path = C:\\BillFree\\Data; Merchant ID = the merchant's MID (e.g. 28669); Target Printer = BillFree; Print Options = tick 'BillFree' and 'BillFree + Print'; Config Mode = Yes (keep ON for a first-time integration); Forward Print Job = Yes with Fwd Target Printer = the customer's physical printer. Leave the rest at defaults (Enable Logging = Yes, AutoPrintMode = Yes, PDF Mode = Auto). Click Save.",
         "Done. The utility now intercepts every print, converts it to PDF + JSON into C:\\BillFree\\Data, and uploads to the server — the customer receives the digital bill via WhatsApp + SMS. Verify with a test print (see appendix-checklist)."
       ],
       "tags": [
@@ -82,7 +82,7 @@
         },
         {
           "src": "kb-images/setup-universal-11.png",
-          "caption": "Step 12 — BillFree Configuration: set Folder Path, Merchant ID (28669), Target Printer = BillFree, tick BillFree + Print, Forward Print Job = Yes, then Save."
+          "caption": "Step 12 — BillFree Configuration: (1) Folder Path, (2) Merchant ID (28669), (3) Target Printer = BillFree, (4) tick BillFree + BillFree + Print, (5) Config Mode = Yes for a first-time integration, (6) Forward Print Job = Yes with Fwd Target Printer, (7) Save."
         }
       ],
       "last_verified": "2026-07",
