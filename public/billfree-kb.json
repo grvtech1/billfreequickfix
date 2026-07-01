@@ -11,11 +11,11 @@
       "symptom": "How does the Universal Setup Utility work / how to install it",
       "cause": "The Universal Utility installs a 'BillFree' virtual printer that intercepts the POS print job, parses it via XPS, writes a PDF + JSON pair into C:\\BillFree\\Data, and uploads them to the BillFree server for WhatsApp + SMS delivery. Because it works at the Windows print layer, it integrates with ANY POS that can print an invoice — no POS-specific plugin needed.",
       "solution": [
-        "Prerequisites: complete merchant onboarding first so an ACTIVE Merchant ID (MID) exists (see onboarding). Also need Windows 7/8/10/11, the merchant's POS able to print invoices, and .NET Framework 4.5 (grab it from the same portal page if missing).",
+        "Prerequisites: complete merchant onboarding first so an ACTIVE Merchant ID (MID) exists (see onboarding). Must be a Windows PC (Windows 7, 8, 10 or 11). On Windows 7 specifically, the installer often shows a .NET Framework error — if that happens, download .NET Framework 4.5 from the same Integration Files portal page, install it, restart the PC, then run the BillFree Universal Setup again.",
         "Log in to the BillFree merchant portal (billfree.in) with the merchant's credentials. You land on the Home dashboard ('Business at a Glance').",
         "Open the Merchant Profile (top-left profile / My Account). It shows Business Details, Store details and Active Features. At the bottom, click 'Download Integration Files'.",
         "On the Integration Files page, download 'BillFree Universal Utility'. This is the BillFreeUniversalSetup Vxx.msi installer (e.g. V10.6). If the PC lacks .NET Framework 4.5, download and install that FIRST from the same page.",
-        "The MSI downloads (e.g. BillFreeUniversalSetup V10.6.msi). Open it to launch the installer.",
+        "The MSI downloads (e.g. BillFreeUniversalSetup V10.6.msi). Open it to launch the installer. Windows 7 — if the installer immediately shows a .NET Framework error: close it, install the .NET 4.5 you downloaded from the portal page, restart the PC, then re-open the MSI.",
         "The 'Welcome to the BillFree Setup Wizard' appears — click Next and complete the wizard with the default options.",
         "The utility installs to C:\\BillFree by default. Confirm the BillFree folder now exists on Local Disk (C:).",
         "Inside C:\\BillFree you'll see the working folders: Data (uploaded PDF+JSON invoices), Doc, Support (printer install scripts), and Temp.",
