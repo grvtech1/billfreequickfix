@@ -2,17 +2,23 @@
 // Body: { id, vote: "up"|"down", note?: string }
 // Stores counters in KV when configured; always console.logs as a fallback signal.
 import { kv, kvReady } from './_kv.js';
+import { applyCors, denySecret, clientIp, rateLimited } from './_gate.js';
+
+const ID_RE = /^[a-z0-9-]{1,64}$/; // KB ids are lowercase kebab slugs
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(204).end();
+  if (applyCors(req, res)) return;
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  if (denySecret(req, res)) return;
+  if (await rateLimited(clientIp(req), { max: 60, windowSec: 60 })) {
+    return res.status(429).json({ error: 'rate limit' });
+  }
 
   try {
     const { id, vote, note } = req.body || {};
-    if (!id || !['up', 'down'].includes(vote)) return res.status(400).json({ error: 'id and vote(up|down) required' });
+    if (typeof id !== 'string' || !ID_RE.test(id) || !['up', 'down'].includes(vote)) {
+      return res.status(400).json({ error: 'valid id and vote(up|down) required' });
+    }
 
     console.log(JSON.stringify({ kind: 'feedback', t: Date.now(), id, vote, note: (note || '').slice(0, 200) }));
 

@@ -3,15 +3,19 @@
 // per-record feedback, the re-authoring queue, and diagnose volume.
 // If KV isn't configured, returns { ready:false } and the UI shows a setup hint.
 import { kv, kvReady } from './_kv.js';
+import { applyCors, denySecret } from './_gate.js';
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  if (req.method === 'OPTIONS') return res.status(204).end();
+  if (applyCors(req, res, 'GET, OPTIONS')) return;
+  // Insights expose internal search analytics + the re-authoring queue (which can
+  // contain staff notes with customer MIDs/numbers) — require the shared secret.
+  if (denySecret(req, res)) return;
   if (!kvReady) return res.status(200).json({ ready: false });
 
   const pairs = (flat) => {
     const out = [];
-    for (let i = 0; i < (flat || []).length; i += 2) out.push({ k: flat[i], n: Number(flat[i + 1]) });
+    const a = flat || [];
+    for (let i = 0; i + 1 < a.length; i += 2) out.push({ k: a[i], n: Number(a[i + 1]) || 0 });
     return out;
   };
   try {

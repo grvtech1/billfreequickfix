@@ -1,16 +1,19 @@
 // /api/log.js — lightweight event log. Primary value: zero-result searches = your KB gap backlog.
 // Body: { event: "search"|"open", q?: string, results?: number, id?: string }
 import { kv, kvReady } from './_kv.js';
+import { applyCors, denySecret, clientIp, rateLimited } from './_gate.js';
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(204).end();
+  if (applyCors(req, res)) return;
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  if (denySecret(req, res)) return;
+  if (await rateLimited(clientIp(req), { max: 120, windowSec: 60 })) {
+    return res.status(429).json({ error: 'rate limit' });
+  }
 
   try {
     const { event, q, results, id } = req.body || {};
+    if (event !== 'search' && event !== 'open') return res.status(400).json({ error: 'bad event' });
     console.log(JSON.stringify({ kind: 'event', t: Date.now(), event, q: (q || '').slice(0, 120), results, id }));
 
     if (kvReady) {

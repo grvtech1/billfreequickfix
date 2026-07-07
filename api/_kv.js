@@ -33,4 +33,5 @@ export const kv = {
   lrange: (key, a, b) => cmd(['LRANGE', key, a, b]),
   zincr: (key, member, n = 1) => cmd(['ZINCRBY', key, n, member]),
   zrevrange: (key, a, b) => cmd(['ZREVRANGE', key, a, b, 'WITHSCORES']),
+  expire: (key, seconds) => cmd(['EXPIRE', key, seconds]),
 };

@@ -93,7 +93,8 @@
         "setup-config-popup",
         "setup-printing-types",
         "setup-directory",
-        "appendix-checklist"
+        "appendix-checklist",
+        "ci-cash-drawer"
       ]
     },
     {
@@ -119,7 +120,11 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "setup-universal",
+        "popup-delivery-options"
+      ]
     },
     {
       "id": "setup-config-popup",
@@ -154,7 +159,14 @@
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "setup-universal",
+        "setup-printing-types",
+        "ci-pagesize-a4a5",
+        "ci-pagesize-a5",
+        "ci-print-cutoff"
+      ]
     },
     {
       "id": "setup-printing-types",
@@ -186,7 +198,12 @@
       "visibility": "public",
       "related": [
         "setup-config-popup",
-        "ci-popup-missing"
+        "ci-popup-missing",
+        "setup-universal",
+        "popup-delivery-options",
+        "ci-cash-drawer",
+        "ci-pagesize-a4a5",
+        "ci-pagesize-a5"
       ]
     },
     {
@@ -223,7 +240,8 @@
       "visibility": "public",
       "related": [
         "setup-flow",
-        "setup-printing-types"
+        "setup-printing-types",
+        "ci-cash-drawer"
       ]
     },
     {
@@ -251,7 +269,10 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "internal"
+      "visibility": "internal",
+      "related": [
+        "setup-universal"
+      ]
     },
     {
       "id": "onboarding",
@@ -281,7 +302,10 @@
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "internal"
+      "visibility": "internal",
+      "related": [
+        "setup-universal"
+      ]
     },
     {
       "id": "busy-select-printer",
@@ -333,7 +357,10 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "busy-twopage"
+      ]
     },
     {
       "id": "busy-3inch",
@@ -354,7 +381,10 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "marg-a4instead3"
+      ]
     },
     {
       "id": "busy-twopage",
@@ -375,7 +405,10 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "busy-a5"
+      ]
     },
     {
       "id": "busy-mobile-field",
@@ -704,7 +737,7 @@
       "category": "POS Integration",
       "system": "GoFrugal",
       "type": "howto",
-      "symptom": "GoFrugal printer change / selection via Bill List reprint (variant of gofrugal-select-printer)",
+      "symptom": "GoFrugal printer change / selection via Bill List reprint",
       "cause": "Printer changed from preview screen.",
       "solution": [
         "Open Bill List / Reprint; click the printer icon.",
@@ -776,7 +809,10 @@
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "genesys-api"
+      ]
     },
     {
       "id": "marg-leftcut",
@@ -800,7 +836,10 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "ci-mfp-noprint"
+      ]
     },
     {
       "id": "marg-a4instead3",
@@ -822,7 +861,11 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "busy-3inch",
+        "ci-pagesize-a4a5"
+      ]
     },
     {
       "id": "marg-api",
@@ -870,7 +913,10 @@
         }
       ],
       "last_verified": "2026-06",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "genesys-api"
+      ]
     },
     {
       "id": "zorder-select",
@@ -1139,7 +1185,10 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "monark-select"
+      ]
     },
     {
       "id": "monark-select",
@@ -1161,7 +1210,10 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "drishti-select"
+      ]
     },
     {
       "id": "eshopaid-identify",
@@ -1472,8 +1524,7 @@
         "System > Integration Modules > Communication Settings.",
         "Select BillFree.",
         "Paste the merchant-specific BillFree Auth Token.",
-        "Save and print a test bill; confirm digital invoice delivered.",
-        "NOTE: In the source guide this content appears under a heading mislabeled '4. Marg API Integration' — the body actually describes Genesys. There is no separate Marg API integration; Marg is printer-based (see marg-config)."
+        "Save and print a test bill; confirm digital invoice delivered."
       ],
       "tags": [
         "genesys",
@@ -1486,7 +1537,8 @@
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "marg-config"
+        "marg-config",
+        "marg-api"
       ]
     },
     {
@@ -1510,8 +1562,7 @@
       ],
       "level": "L1",
       "images": [],
-      "last_verified": "unverified",
-      "visibility": "public"
+      "visibility": "internal"
     },
     {
       "id": "busy-api-install",
@@ -1560,7 +1611,15 @@
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "busy-api-bcd",
+        "busy-api-billship",
+        "busy-api-vsg",
+        "busy-api-config",
+        "busy-api-discount",
+        "busy-api-digitalbill"
+      ]
     },
     {
       "id": "busy-api-bcd",
@@ -1574,7 +1633,7 @@
         "Open BUSY, open the company.",
         "Administration > Utilities > Customization > Custom Validation > Restore Custom Validation.",
         "Browse and select BillFree.bcd, click Restore.",
-        "Default password: B!llfree@@)!^",
+        "Default password: obtain from L2 / the BillFree secrets vault (never stored in this KB).",
         "Design custom validation: select BillFree/BillFree POS format; copy the 8-digit license no. from the busy file (C:\\BusyWin) and paste into the dongle no. field; Save. (Also disables the demo-mode popup after saving a bill.)"
       ],
       "tags": [
@@ -1641,7 +1700,15 @@
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "internal"
+      "visibility": "internal",
+      "related": [
+        "busy-api-install",
+        "busy-api-billship",
+        "busy-api-vsg",
+        "busy-api-config",
+        "busy-api-discount",
+        "busy-api-digitalbill"
+      ]
     },
     {
       "id": "busy-api-billship",
@@ -1681,7 +1748,15 @@
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "busy-api-install",
+        "busy-api-bcd",
+        "busy-api-vsg",
+        "busy-api-config",
+        "busy-api-discount",
+        "busy-api-digitalbill"
+      ]
     },
     {
       "id": "busy-api-vsg",
@@ -1722,7 +1797,15 @@
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "busy-api-install",
+        "busy-api-bcd",
+        "busy-api-billship",
+        "busy-api-config",
+        "busy-api-discount",
+        "busy-api-digitalbill"
+      ]
     },
     {
       "id": "busy-api-config",
@@ -1763,7 +1846,15 @@
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "busy-api-install",
+        "busy-api-bcd",
+        "busy-api-billship",
+        "busy-api-vsg",
+        "busy-api-discount",
+        "busy-api-digitalbill"
+      ]
     },
     {
       "id": "busy-api-discount",
@@ -1784,7 +1875,15 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "busy-api-install",
+        "busy-api-bcd",
+        "busy-api-billship",
+        "busy-api-vsg",
+        "busy-api-config",
+        "busy-api-digitalbill"
+      ]
     },
     {
       "id": "busy-api-digitalbill",
@@ -1823,7 +1922,15 @@
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "busy-api-install",
+        "busy-api-bcd",
+        "busy-api-billship",
+        "busy-api-vsg",
+        "busy-api-config",
+        "busy-api-discount"
+      ]
     },
     {
       "id": "ci-net7",
@@ -1931,7 +2038,10 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "ci-cash-drawer"
+      ]
     },
     {
       "id": "ci-cash-drawer",
@@ -2018,7 +2128,9 @@
         "setup-config-popup",
         "setup-printing-types",
         "ci-a5-portrait",
-        "marg-a4instead3"
+        "marg-a4instead3",
+        "ci-pagesize-a5",
+        "ci-print-cutoff"
       ]
     },
     {
@@ -2064,7 +2176,8 @@
         "ci-pagesize-a4a5",
         "setup-config-popup",
         "setup-printing-types",
-        "ci-a5-portrait"
+        "ci-a5-portrait",
+        "ci-print-cutoff"
       ]
     },
     {
@@ -2157,7 +2270,10 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "ci-notdeliver-data"
+      ]
     },
     {
       "id": "ci-notdeliver-data",
@@ -2180,7 +2296,10 @@
       "level": "L2",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "ci-notdeliver-nodata"
+      ]
     },
     {
       "id": "ci-popup-missing",
@@ -2208,7 +2327,10 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "setup-printing-types"
+      ]
     },
     {
       "id": "ci-a5-portrait",
@@ -2232,7 +2354,11 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "ci-pagesize-a4a5",
+        "ci-pagesize-a5"
+      ]
     },
     {
       "id": "ci-mfp-noprint",
@@ -2260,7 +2386,10 @@
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "marg-leftcut"
+      ]
     },
     {
       "id": "ci-rightcut",
@@ -2407,7 +2536,10 @@
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "setup-universal"
+      ]
     },
     {
       "id": "appendix-glossary",
@@ -2453,7 +2585,8 @@
       "level",
       "images",
       "last_verified",
-      "visibility"
+      "visibility",
+      "related"
     ],
     "notes": "id is immutable (join key for AI matches, deep links, feedback). last_verified=YYYY-MM. visibility: public|internal."
   }
