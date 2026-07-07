@@ -44,6 +44,21 @@ export function denySecret(req, res) {
   return false;
 }
 
+// Soft check (no response written): true when a secret is configured AND the
+// caller presents the matching value. Used by /api/kb to decide whether to
+// include internal-only records, without 401-ing unauthenticated callers.
+export function hasValidSecret(req) {
+  const secret = process.env.KB_SHARED_SECRET;
+  if (!secret) return false;
+  const got = req.headers['x-kb-secret'];
+  return typeof got === 'string' && timingSafeEqual(got, secret);
+}
+
+// Whether a secret gate is configured at all.
+export function secretConfigured() {
+  return !!process.env.KB_SHARED_SECRET;
+}
+
 // Constant-time string compare to avoid leaking the secret via timing.
 function timingSafeEqual(a, b) {
   if (a.length !== b.length) return false;

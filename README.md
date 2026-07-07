@@ -6,15 +6,21 @@ server-side; the proxy is an adapter, so the front-end is provider-agnostic.
 
 ```
 billfree-deploy/
+├── kb/
+│   └── billfree-kb.json   ← KB SOURCE OF TRUTH — edit this, then run scripts/build_kb.py
+├── scripts/
+│   └── build_kb.py        ← regenerates api/_kbdata.js + the public-only offline fallback
 ├── public/
-│   ├── index.html         ← the app (loads KB from billfree-kb.json, embedded copy as fallback)
-│   ├── billfree-kb.json   ← KB source of truth — edit this to update content, no code change
-│   └── kb-images/         ← 133 screenshots, mapped to records
+│   ├── index.html         ← the app (loads KB from /api/kb; embedded PUBLIC-only copy as fallback)
+│   └── kb-images/         ← screenshots, mapped to records
 ├── api/
-│   ├── diagnose.js        ← Gemini proxy/adapter (holds key, rate-limit, optional secret)
-│   ├── feedback.js        ← 👍/👎 per fix → re-authoring queue
-│   ├── log.js             ← search/open events (zero-result searches = KB gaps)
-│   ├── stats.js           ← read aggregates for the Insights panel
+│   ├── kb.js              ← serves the KB; internal records gated behind the shared secret
+│   ├── _kbdata.js         ← GENERATED full KB, bundled server-side (never a public asset)
+│   ├── _gate.js           ← shared CORS + secret gate + trusted-IP + Redis rate limiter
+│   ├── diagnose.js        ← Gemini proxy/adapter (holds key, rate-limit, secret)
+│   ├── feedback.js        ← 👍/👎 per fix → re-authoring queue (gated)
+│   ├── log.js             ← search/open events (gated); zero-result searches = KB gaps
+│   ├── stats.js           ← read aggregates for the Insights panel (gated)
 │   └── _kv.js             ← Upstash Redis REST helper (no npm dependency)
 ├── vercel.json
 └── README.md
@@ -70,10 +76,21 @@ Pick your protection:
   out upstream calls at 25 s, and returns generic errors (no key/quota leakage).
 
 ## Updating the KB
-Edit `public/billfree-kb.json` and redeploy — the app fetches it at load. Keep record `id`s
-immutable (they're the join key for AI matches, deep links, feedback, and analytics).
-The embedded copy in `index.html` is only the offline fallback; regenerate it if you want the
-fallback current, but the JSON is the source of truth.
+1. Edit **`kb/billfree-kb.json`** (the single source of truth).
+2. Run **`python scripts/build_kb.py`** — this regenerates `api/_kbdata.js` (the full KB the
+   `/api/kb` function serves) and rewrites the **public-only** `EMBEDDED_KB` offline fallback in
+   `index.html`. The script fails if any `visibility:"internal"` record would leak into the public
+   fallback.
+3. Redeploy.
+
+Keep record `id`s immutable (they're the join key for AI matches, deep links, feedback, and
+analytics). The KB is **no longer a static file** — `public/billfree-kb.json` was removed so the
+internal records aren't world-readable; the browser loads the KB from the gated `/api/kb` endpoint
+(sending the shared secret via `apiHeaders()`), and internal records are only returned to callers
+that present a valid secret.
+
+> Note: if this GitHub repo is **public**, the internal records are still visible in
+> `api/_kbdata.js` and `kb/billfree-kb.json` on GitHub. Make the repo **private** if that matters.
 
 ### Adding / fixing screenshots
 Drop images in `public/kb-images/` and reference them in a record:
