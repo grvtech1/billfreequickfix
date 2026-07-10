@@ -8,7 +8,7 @@
 // format, then reshapes Gemini's reply back into {content:[{type:'text',text}]} so the
 // front-end's parsing, multi-turn flow and offline fallback keep working unchanged.
 import { kv, kvReady } from './_kv.js';
-import { applyCors, denySecret, clientIp, rateLimited } from './_gate.js';
+import { applyCors, denySecret, rateLimited } from './_gate.js';
 
 const DEFAULT_MODEL = 'gemini-2.5-flash';
 const MAX_OUTPUT_TOKENS = 1500;     // server ceiling — client cannot exceed this
@@ -27,8 +27,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
   if (denySecret(req, res)) return;
 
-  const ip = clientIp(req);
-  if (await rateLimited(ip, { max: 20, windowSec: 60 })) {
+  if (await rateLimited(req, { max: 20, windowSec: 60 })) {
     return res.status(429).json({ error: 'rate limit — slow down a moment' });
   }
 

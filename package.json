@@ -4,8 +4,9 @@
   "private": true,
   "description": "BillFree QuickFix — L1 troubleshooting console (static SPA + Vercel functions)",
   "scripts": {
+    "build:kb": "node scripts/build-kb.mjs",
     "test": "node scripts/smoke-test.mjs",
-    "build": "node scripts/smoke-test.mjs",
+    "build": "node scripts/build-kb.mjs && node scripts/smoke-test.mjs",
     "eval": "node scripts/eval-kb.mjs"
   }
 }

@@ -23,7 +23,7 @@ export function applyCors(req, res, methods = 'POST, OPTIONS') {
     res.setHeader('Vary', 'Origin');
   }
   res.setHeader('Access-Control-Allow-Methods', methods);
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-kb-secret');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-kb-secret, x-kb-client');
   if (req.method === 'OPTIONS') {
     res.status(204).end();
     return true;
@@ -67,6 +67,16 @@ function timingSafeEqual(a, b) {
   return diff === 0;
 }
 
+// Redact likely PII before anything is logged or stored: runs of 6+ digits are
+// almost always a mobile number, MID, or license/dongle number. Real search
+// tokens ("0x709", "a4", "net 4.5") are shorter and survive. Applied to search
+// queries and feedback notes so raw customer numbers never land in logs or KV.
+export function redactPII(s) {
+  if (typeof s !== 'string') return s;
+  // 6+ digit runs (optionally spaced/dashed): mobile numbers, MIDs, licenses.
+  return s.replace(/\d[\d\s-]{4,}\d/g, '[redacted]');
+}
+
 // Best-effort client IP that is NOT spoofable via a client-supplied header.
 // Vercel sets x-vercel-forwarded-for to the real edge-observed client IP.
 export function clientIp(req) {
@@ -77,29 +87,49 @@ export function clientIp(req) {
   return 'local';
 }
 
-// Distributed fixed-window rate limiter. When KV is configured the counter is
-// shared across all serverless instances (the in-memory Map it replaces only
-// limited per warm instance, so N instances = N× the intended ceiling).
-// Falls back to a per-instance Map when KV is absent so dev still has a guard.
-const memWindows = new Map(); // ip -> [timestamps]  (fallback only)
+// A stable per-agent id the client persists in localStorage and sends as
+// x-kb-client. Lets us rate-limit an individual agent rather than a whole
+// office NAT — several agents behind ONE public IP no longer starve each
+// other's budget. Falls back to IP when absent. Format-validated so it can't
+// be used to inject a weird KV key.
+export function clientKey(req) {
+  const c = req.headers['x-kb-client'];
+  if (typeof c === 'string' && /^[a-z0-9]{6,40}$/i.test(c)) return 'c:' + c;
+  return 'ip:' + clientIp(req);
+}
 
-export async function rateLimited(ip, { max = 20, windowSec = 60 } = {}) {
+// One fixed-window counter. KV-backed (shared across instances) when configured;
+// per-instance Map otherwise so dev still has a guard.
+const memWindows = new Map();
+async function overLimit(key, max, windowSec) {
   if (kvReady) {
     const bucket = Math.floor(Date.now() / 1000 / windowSec);
-    const key = `rate:${ip}:${bucket}`;
+    const k = `rate:${key}:${bucket}`;
     try {
-      const n = await kv.incr(key);
-      if (n === 1) await kv.expire(key, windowSec * 2).catch(() => {});
+      const n = await kv.incr(k);
+      if (n === 1) await kv.expire(k, windowSec * 2).catch(() => {});
       return n > max;
     } catch {
-      // KV hiccup → fail open rather than lock everyone out
-      return false;
+      return false; // KV hiccup → fail open, don't lock everyone out
     }
   }
   const now = Date.now();
   const winMs = windowSec * 1000;
-  const arr = (memWindows.get(ip) || []).filter((t) => now - t < winMs);
+  const arr = (memWindows.get(k(key, windowSec)) || []).filter((t) => now - t < winMs);
   arr.push(now);
-  memWindows.set(ip, arr);
+  memWindows.set(k(key, windowSec), arr);
   return arr.length > max;
+}
+const k = (key, w) => `${key}:${Math.floor(Date.now() / 1000 / w)}`;
+
+// Two-tier limiter. Pass the REQUEST (not an ip string):
+//   • per-agent  (x-kb-client, or IP fallback) at `max`/window — the real limit
+//   • per-IP backstop at `ipMax`/window — only when a client id is present, so
+//     someone rotating client ids can't exceed a sane whole-IP ceiling.
+export async function rateLimited(req, { max = 20, windowSec = 60, ipMax = 120 } = {}) {
+  const agent = clientKey(req);
+  if (await overLimit(agent, max, windowSec)) return true;
+  const ipTier = 'ip:' + clientIp(req);
+  if (agent !== ipTier && (await overLimit(ipTier, ipMax, windowSec))) return true;
+  return false;
 }

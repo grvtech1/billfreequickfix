@@ -103,22 +103,27 @@ records.forEach((r) => Object.keys(r).forEach((k) => usedFields.add(k)));
 const undeclared = [...usedFields].filter((f) => !declared.has(f));
 undeclared.length ? fail('fields used but not in schema.fields: ' + undeclared.join(', ')) : ok('schema.fields covers every used field');
 
-// ---- 5. generated api/_kbdata.js is in sync ---------------------------------
-section('generated api/_kbdata.js sync');
+// Deep content equality — not just ids/counts. Catches editing the master's
+// step text and forgetting to regenerate (ids/counts would still match).
+const canon = (r) => JSON.stringify(r);
+
+// ---- 5. generated api/_kbdata.js is in FULL sync ----------------------------
+section('generated api/_kbdata.js sync (deep)');
 try {
   const mod = await imp(p('api', '_kbdata.js'));
   const bundled = mod.KB?.records || [];
-  if (bundled.length !== records.length) fail(`_kbdata.js has ${bundled.length} records, master has ${records.length} — run scripts/build_kb.py`);
+  if (bundled.length !== records.length) fail(`_kbdata.js has ${bundled.length} records, master has ${records.length} — run "npm run build:kb"`);
   else {
-    const a = records.map((r) => r.id).join('|');
-    const b = bundled.map((r) => r.id).join('|');
-    a === b ? ok('_kbdata.js matches master (run build_kb.py after every KB edit)') : fail('_kbdata.js record ids differ from master — run scripts/build_kb.py');
+    const mismatches = records.filter((r, i) => canon(r) !== canon(bundled[i]));
+    mismatches.length
+      ? fail(`_kbdata.js content differs from master in ${mismatches.length} record(s) (e.g. "${mismatches[0].id}") — run "npm run build:kb"`)
+      : ok('_kbdata.js is byte-for-byte in sync with master');
   }
 } catch (e) {
   fail('cannot import api/_kbdata.js: ' + e.message);
 }
 
-// ---- 6. public EMBEDDED_KB fallback is PUBLIC-ONLY + in sync -----------------
+// ---- 6. public EMBEDDED_KB fallback is PUBLIC-ONLY + in FULL sync ------------
 section('public EMBEDDED_KB fallback (index.html)');
 const html = readFileSync(p('public', 'index.html'), 'utf8');
 const line = html.split('\n').find((l) => l.startsWith('const EMBEDDED_KB = '));
@@ -129,8 +134,13 @@ else {
     const internalIds = new Set(records.filter((r) => r.visibility === 'internal').map((r) => r.id));
     const leaked = embed.filter((r) => internalIds.has(r.id)).map((r) => r.id);
     leaked.length ? fail('INTERNAL records leaked into public fallback: ' + leaked.join(', ')) : ok(`${embed.length} public records, no internal leak`);
-    const publicCount = records.filter((r) => r.visibility !== 'internal').length;
-    if (embed.length !== publicCount) fail(`embed has ${embed.length} records, expected ${publicCount} public — run scripts/build_kb.py`);
+    const publicRecs = records.filter((r) => r.visibility !== 'internal');
+    if (embed.length !== publicRecs.length) fail(`embed has ${embed.length} records, expected ${publicRecs.length} public — run "npm run build:kb"`);
+    else {
+      const drift = publicRecs.filter((r, i) => canon(r) !== canon(embed[i]));
+      if (drift.length) fail(`EMBEDDED_KB content differs from master in ${drift.length} record(s) (e.g. "${drift[0].id}") — run "npm run build:kb"`);
+      else ok('EMBEDDED_KB is in full sync with the public records');
+    }
   } catch (e) {
     fail('EMBEDDED_KB is not valid JSON: ' + e.message);
   }

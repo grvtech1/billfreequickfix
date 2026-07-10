@@ -6,16 +6,25 @@ const URL = process.env.KV_REST_API_URL;
 const TOKEN = process.env.KV_REST_API_TOKEN;
 export const kvReady = !!(URL && TOKEN);
 
+const TIMEOUT_MS = 2000; // never let a hung Upstash call hold the function open
+
 async function cmd(args) {
   if (!kvReady) return null;
-  const r = await fetch(URL, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${TOKEN}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(args),
-  });
-  if (!r.ok) throw new Error('kv ' + r.status);
-  const j = await r.json();
-  return j.result;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  try {
+    const r = await fetch(URL, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(args),
+      signal: ctrl.signal,
+    });
+    if (!r.ok) throw new Error('kv ' + r.status + ': ' + (await r.text().catch(() => '')).slice(0, 120));
+    const j = await r.json();
+    return j.result;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export const kv = {

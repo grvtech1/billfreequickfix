@@ -7,22 +7,28 @@ server-side; the proxy is an adapter, so the front-end is provider-agnostic.
 ```
 billfree-deploy/
 ├── kb/
-│   └── billfree-kb.json   ← KB SOURCE OF TRUTH — edit this, then run scripts/build_kb.py
+│   └── billfree-kb.json   ← KB SOURCE OF TRUTH — edit this, then `npm run build:kb`
 ├── scripts/
-│   └── build_kb.py        ← regenerates api/_kbdata.js + the public-only offline fallback
+│   ├── build-kb.mjs       ← regenerates api/_kbdata.js + the public-only fallback (runs on every deploy)
+│   ├── smoke-test.mjs     ← deploy gate: KB integrity, deep generated-file sync, api imports
+│   └── eval-kb.mjs        ← KB matching eval (offline findability + opt-in live AI)
+├── evals/cases.json       ← real L1 queries → expected record (drives eval-kb.mjs)
 ├── public/
 │   ├── index.html         ← the app (loads KB from /api/kb; embedded PUBLIC-only copy as fallback)
 │   └── kb-images/         ← screenshots, mapped to records
 ├── api/
 │   ├── kb.js              ← serves the KB; internal records gated behind the shared secret
 │   ├── _kbdata.js         ← GENERATED full KB, bundled server-side (never a public asset)
-│   ├── _gate.js           ← shared CORS + secret gate + trusted-IP + Redis rate limiter
+│   ├── health.js          ← cheap AI/KV capability probe (no upstream call)
+│   ├── _gate.js           ← CORS + secret gate + trusted-IP + 2-tier rate limiter + PII redaction
 │   ├── diagnose.js        ← Gemini proxy/adapter (holds key, rate-limit, secret)
-│   ├── feedback.js        ← 👍/👎 per fix → re-authoring queue (gated)
-│   ├── log.js             ← search/open events (gated); zero-result searches = KB gaps
+│   ├── feedback.js        ← 👍/👎 per fix → re-authoring queue (gated, PII-redacted)
+│   ├── log.js             ← search/open events (gated, PII-redacted); zero-results = KB gaps
 │   ├── stats.js           ← read aggregates for the Insights panel (gated)
-│   └── _kv.js             ← Upstash Redis REST helper (no npm dependency)
-├── vercel.json
+│   └── _kv.js             ← Upstash Redis REST helper (2s timeout, no npm dependency)
+├── .github/workflows/ci.yml  ← runs the smoke test on every push
+├── package.json
+├── vercel.json            ← buildCommand runs build-kb + smoke test (deploy gate)
 └── README.md
 ```
 
@@ -68,20 +74,32 @@ Pick your protection:
   (`diagnose`, `stats`, `log`, `feedback`) enforce it — not just `diagnose`.
 
 **Hardening applied** (all automatic):
-- Rate limit is **Redis-backed** (shared across instances) when KV is configured, falling back to
-  per-instance only in dev. Client IP is read from Vercel's trusted `x-vercel-forwarded-for`.
+- **Two-tier rate limit**: per-agent (the client sends a random, PII-free `x-kb-client` id it
+  persists locally) so several agents behind ONE office IP don't starve each other, plus a higher
+  per-IP backstop against id-rotation abuse. Redis-backed (shared across instances) when KV is set.
+  Client IP is read from Vercel's trusted `x-vercel-forwarded-for`.
+- **PII redaction**: 6+ digit runs (mobile numbers, MIDs, licenses) are stripped from search
+  queries and feedback notes before they touch logs or KV.
+- The status-line **AI probe hits `/api/health`** (reports whether the key is configured) instead
+  of firing a real Gemini request per page load — no wasted quota or rate-limit slots.
 - CORS defaults to **same-origin only** (no `Access-Control-Allow-Origin: *`). To allow another
   origin, set `ALLOWED_ORIGINS` (comma-separated).
 - `diagnose` caps `max_tokens` server-side, uses `BLOCK_ONLY_HIGH` safety (not `BLOCK_NONE`), times
-  out upstream calls at 25 s, and returns generic errors (no key/quota leakage).
+  out upstream calls at 25 s, and returns generic errors (no key/quota leakage). KV calls time out
+  at 2 s so a hung Upstash never holds the function open.
 
 ## Updating the KB
 1. Edit **`kb/billfree-kb.json`** (the single source of truth).
-2. Run **`python scripts/build_kb.py`** — this regenerates `api/_kbdata.js` (the full KB the
-   `/api/kb` function serves) and rewrites the **public-only** `EMBEDDED_KB` offline fallback in
-   `index.html`. The script fails if any `visibility:"internal"` record would leak into the public
-   fallback.
+2. Run **`npm run build:kb`** — regenerates `api/_kbdata.js` (the full KB the `/api/kb` function
+   serves) and the **public-only** `EMBEDDED_KB` offline fallback in `index.html`. It also runs
+   automatically as part of the deploy (`npm run build`), so a forgotten rebuild can't ship — the
+   smoke test **fails the deploy** if the generated files drift from the master, and refuses to let
+   any `visibility:"internal"` record reach the public fallback.
 3. Redeploy.
+
+Run **`npm test`** anytime for the full integrity check, and **`npm run eval`** to check that real
+L1 queries still surface the right record (add cases to `evals/cases.json`; `--min 80` makes it a
+gate, `--ai <url>` runs it against live Gemini).
 
 Keep record `id`s immutable (they're the join key for AI matches, deep links, feedback, and
 analytics). The KB is **no longer a static file** — `public/billfree-kb.json` was removed so the
