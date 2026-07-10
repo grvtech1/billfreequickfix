@@ -2324,7 +2324,13 @@ export const KB = {
         "quarantine",
         "printer",
         "mid",
-        "tdl"
+        "tdl",
+        "no popup",
+        "popup not coming",
+        "mobile number",
+        "enter mobile number",
+        "bill saved",
+        "after saving bill"
       ],
       "level": "L1",
       "images": [],

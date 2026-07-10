@@ -1,0 +1,11 @@
+{
+  "name": "billfreequickfix",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BillFree QuickFix — L1 troubleshooting console (static SPA + Vercel functions)",
+  "scripts": {
+    "test": "node scripts/smoke-test.mjs",
+    "build": "node scripts/smoke-test.mjs",
+    "eval": "node scripts/eval-kb.mjs"
+  }
+}
