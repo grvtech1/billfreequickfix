@@ -8,17 +8,19 @@
 // format, then reshapes Gemini's reply back into {content:[{type:'text',text}]} so the
 // front-end's parsing, multi-turn flow and offline fallback keep working unchanged.
 import { kv, kvReady } from './_kv.js';
-import { applyCors, denySecret, rateLimited } from './_gate.js';
+import { applyCors, denySecret, rateLimited, redactPII } from './_gate.js';
 
 const DEFAULT_MODEL = 'gemini-2.5-flash';
 const MAX_OUTPUT_TOKENS = 1500;     // server ceiling — client cannot exceed this
 const UPSTREAM_TIMEOUT_MS = 25000;  // leave headroom under the 30s function limit
 
 // Anthropic-style messages -> Gemini "contents" (assistant -> model).
+// PII (mobile numbers, MIDs) is redacted before the text leaves for Google —
+// those digits are never diagnostic, so the AI loses nothing useful.
 function toGeminiContents(messages) {
   return (messages || []).map((m) => ({
     role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: typeof m.content === 'string' ? m.content : JSON.stringify(m.content) }],
+    parts: [{ text: redactPII(typeof m.content === 'string' ? m.content : JSON.stringify(m.content)) }],
   }));
 }
 

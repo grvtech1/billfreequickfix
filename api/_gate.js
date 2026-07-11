@@ -31,11 +31,23 @@ export function applyCors(req, res, methods = 'POST, OPTIONS') {
   return false;
 }
 
-// Enforce the shared secret when KB_SHARED_SECRET is configured. Returns true if
-// the request was rejected (caller should stop). Uses a length-safe compare.
+// Enforce the shared secret. Returns true if the request was rejected (caller
+// should stop). Uses a length-safe compare.
+//
+// Fail-closed opt-in: set KB_REQUIRE_SECRET=1 to assert "this deployment MUST be
+// gated". If the secret is then missing (e.g. env accidentally cleared), paid/
+// write endpoints refuse to serve rather than silently running wide open. Without
+// that flag, a missing secret leaves the endpoint open (dev / intentionally-open
+// deployments) — unchanged behaviour.
 export function denySecret(req, res) {
   const secret = process.env.KB_SHARED_SECRET;
-  if (!secret) return false; // gate disabled → allow (dev / open deployments)
+  if (!secret) {
+    if (isTruthy(process.env.KB_REQUIRE_SECRET)) {
+      res.status(503).json({ error: 'endpoint not configured (KB_SHARED_SECRET missing)' });
+      return true;
+    }
+    return false; // gate disabled → allow (dev / open deployments)
+  }
   const got = req.headers['x-kb-secret'];
   if (typeof got !== 'string' || !timingSafeEqual(got, secret)) {
     res.status(401).json({ error: 'unauthorized' });
@@ -43,6 +55,8 @@ export function denySecret(req, res) {
   }
   return false;
 }
+
+const isTruthy = (v) => v === '1' || v === 'true' || v === 'yes';
 
 // Soft check (no response written): true when a secret is configured AND the
 // caller presents the matching value. Used by /api/kb to decide whether to

@@ -14,11 +14,34 @@ import { dirname, join } from 'node:path';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const p = (...a) => join(ROOT, ...a);
 
+const die = (msg) => { console.error('BUILD-KB ERROR: ' + msg); process.exit(1); };
+
 const data = JSON.parse(readFileSync(p('kb', 'billfree-kb.json'), 'utf8'));
+
+// ---- validate BEFORE writing anything (don't overwrite good output with bad) ----
 const full = data.records;
-const publicRecs = full.filter((r) => r.visibility !== 'internal');
-const internalIds = full.filter((r) => r.visibility === 'internal').map((r) => r.id);
+if (!Array.isArray(full) || full.length === 0) die('records[] missing or empty');
+const seen = new Set();
+for (const r of full) {
+  if (!r || typeof r.id !== 'string') die('a record has no string id');
+  if (seen.has(r.id)) die('duplicate id: ' + r.id);
+  seen.add(r.id);
+  if (r.visibility !== 'public' && r.visibility !== 'internal') {
+    die(`record "${r.id}" has visibility "${r.visibility}" (must be "public" or "internal")`);
+  }
+}
+
+// Explicit, fail-safe public filter: a record reaches the world-readable fallback
+// ONLY if it is EXPLICITLY public. Anything else stays out — a typo'd/missing
+// visibility can never leak into the public copy.
+const publicRecs = full.filter((r) => r.visibility === 'public');
+const internalIds = full.filter((r) => r.visibility !== 'public').map((r) => r.id);
 console.log(`full=${full.length} public=${publicRecs.length} internal=${internalIds.length}`);
+
+// Escape "</script>" (and "<!--") so KB text can't break out of the inline
+// <script> when injected into index.html. JSON.parse / the JS parser restore
+// the original characters from the < escape.
+const safeJSON = (v) => JSON.stringify(v).replace(/</g, '\\u003c');
 
 // 1) bundled full KB module (server-side only)
 const header =
@@ -29,7 +52,7 @@ writeFileSync(p('api', '_kbdata.js'), header + JSON.stringify(data, null, 2) + '
 console.log('wrote api/_kbdata.js');
 
 // 2) public-only embedded fallback (single line) in index.html
-const embed = 'const EMBEDDED_KB = ' + JSON.stringify(publicRecs) + ';';
+const embed = 'const EMBEDDED_KB = ' + safeJSON(publicRecs) + ';';
 const html = readFileSync(p('public', 'index.html'), 'utf8').split('\n');
 let n = 0;
 for (let i = 0; i < html.length; i++) {

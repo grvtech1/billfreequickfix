@@ -146,7 +146,26 @@ else {
   }
 }
 
-// ---- 7. every /api function imports cleanly ---------------------------------
+// ---- 7. attribute escaping (regression guard for the copy/quoted-command bug)
+section('attribute escaping');
+// esc() is text-context only (does not escape quotes). Using it inside an HTML
+// attribute lets a KB step like  regsvr32 "C:\...dll"  break out of data-copy
+// and truncate the copied command. Attributes must use escAttr().
+const attrEscViolations = html.split('\n')
+  .map((l, i) => ({ i: i + 1, l }))
+  .filter(({ l }) => /[a-z-]+\s*=\s*"\$\{esc\(/.test(l));
+attrEscViolations.length
+  ? attrEscViolations.forEach(({ i }) => fail(`index.html:${i} uses quote-unsafe esc() in an attribute — use escAttr()`))
+  : ok('no quote-unsafe esc() in any attribute (escAttr used throughout)');
+
+// escAttr() must actually escape quotes (the whole point). Inspect its source.
+const escAttrLine = html.split('\n').find((l) => l.startsWith('const escAttr='));
+if (!escAttrLine) fail('escAttr() not defined in index.html');
+else if (!/\[&<>"'\]/.test(escAttrLine) || !escAttrLine.includes('&quot;')) {
+  fail('escAttr() does not escape double/single quotes — attribute injection still possible');
+} else ok('escAttr() escapes quotes (attribute-safe)');
+
+// ---- 8. every /api function imports cleanly ---------------------------------
 section('api/*.js import check');
 const apiFiles = readdirSync(p('api')).filter((f) => f.endsWith('.js') && !f.startsWith('_kbdata'));
 for (const f of apiFiles) {
