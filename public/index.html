@@ -694,10 +694,8 @@ document.addEventListener('keydown',e=>{
 /* ====== AI (multi-turn) ====== */
 let convo=[];            // [{role, content}]
 let aiCtx={pos:'',os:''};
-function kbForModel(){return visKB().map(r=>({id:r.id,system:r.system,category:r.category,symptom:r.symptom,cause:r.cause||"",tags:r.tags}));}
-const SYS_PROMPT=`You are an L1 technical-support diagnostic engine for BillFree, a WhatsApp digital-billing platform that integrates with retail POS systems via a virtual printer ("Universal"), Tally BillTransfer/TDL, Busy add-ons, and push APIs. Diagnose using ONLY the provided KB. The conversation may continue ("tried that, still failing") — refine your diagnosis using the new info. Always respond with STRICT JSON, no markdown, shaped exactly:
-{"assessment":"1-2 sentence plain diagnosis","matches":[{"id":"<kb id>","why":"one line","confidence":"high|medium|low"}],"steps":["ordered concrete action"],"escalate":"none|L2|L3","escalate_reason":"short or empty"}
-Rank matches best-first, max 4. Only use ids present in the KB. If nothing fits, empty matches and put guidance in steps.`;
+/* The diagnostic prompt + KB grounding now live SERVER-SIDE in /api/diagnose.
+   The client only sends the agent's conversation turns, never the prompt or KB. */
 
 function openAI(prefill){
   const m=document.getElementById('aiModal');
@@ -734,7 +732,7 @@ function appendTurn(html){const o=document.getElementById('aiOut');const d=docum
 function startDiagnose(problem){
   if(!problem){appendTurn('<div class="ai-err">Describe the problem first.</div>');return;}
   document.getElementById('aiRun').disabled=true;
-  const firstMsg=`KB:\n${JSON.stringify(kbForModel())}\n\nREPORTED PROBLEM: ${problem}\nPOS/SYSTEM: ${aiCtx.pos||'unknown'}\nOS: ${aiCtx.os||'unknown'}\n\nReturn the JSON now.`;
+  const firstMsg=`REPORTED PROBLEM: ${problem}\nPOS/SYSTEM: ${aiCtx.pos||'unknown'}\nOS: ${aiCtx.os||'unknown'}\n\nReturn the JSON now.`;
   convo.push({role:'user',content:firstMsg});
   runTurn(problem);
 }
@@ -744,7 +742,7 @@ async function runTurn(displayQ){
   document.getElementById('aiFollow').style.display='none';
   try{
     const res=await fetch("/api/diagnose",{method:"POST",headers:apiHeaders(),
-      body:JSON.stringify({model:"gemini-flash",max_tokens:1000,system:SYS_PROMPT,messages:convo})});
+      body:JSON.stringify({max_tokens:1000,messages:convo})});
     const data=await res.json();
     if(!res.ok){turn.querySelector('.ai-think').outerHTML=`<div class="ai-err">${esc(data.error||('Error '+res.status))} — search & guided triage still work fully.</div>`;done();return;}
     const text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join("");

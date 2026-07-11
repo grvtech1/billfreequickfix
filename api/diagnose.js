@@ -8,11 +8,39 @@
 // format, then reshapes Gemini's reply back into {content:[{type:'text',text}]} so the
 // front-end's parsing, multi-turn flow and offline fallback keep working unchanged.
 import { kv, kvReady } from './_kv.js';
-import { applyCors, denySecret, rateLimited, redactPII } from './_gate.js';
+import { applyCors, denySecret, rateLimited, redactPII, hasValidSecret } from './_gate.js';
+import { KB } from './_kbdata.js';
 
 const DEFAULT_MODEL = 'gemini-2.5-flash';
 const MAX_OUTPUT_TOKENS = 1500;     // server ceiling — client cannot exceed this
 const UPSTREAM_TIMEOUT_MS = 25000;  // leave headroom under the 30s function limit
+
+// The diagnostic prompt is OWNED BY THE SERVER. The client no longer sends the
+// system prompt or the KB — it only sends the agent's conversation turns. This
+// means even an open/unauthenticated endpoint can only ever run this one KB-
+// matching task; it can't be driven as a general-purpose LLM on our quota.
+const SYS_PROMPT =
+  'You are an L1 technical-support diagnostic engine for BillFree, a WhatsApp digital-billing ' +
+  'platform that integrates with retail POS systems via a virtual printer ("Universal"), Tally ' +
+  'BillTransfer/TDL, Busy add-ons, and push APIs. Diagnose using ONLY the provided KB. The ' +
+  'conversation may continue ("tried that, still failing") — refine your diagnosis using the new ' +
+  'info. Always respond with STRICT JSON, no markdown, shaped exactly:\n' +
+  '{"assessment":"1-2 sentence plain diagnosis","matches":[{"id":"<kb id>","why":"one line",' +
+  '"confidence":"high|medium|low"}],"steps":["ordered concrete action"],"escalate":"none|L2|L3",' +
+  '"escalate_reason":"short or empty"}\n' +
+  'Rank matches best-first, max 4. Only use ids present in the KB. If nothing fits, empty matches ' +
+  'and put guidance in steps.';
+
+// KB grounding, built server-side from the bundled KB. Internal records are only
+// included for callers that present a valid secret (same rule as /api/kb).
+function kbGrounding(authed) {
+  return KB.records
+    .filter((r) => authed || r.visibility !== 'internal')
+    .map((r) => ({ id: r.id, system: r.system, category: r.category, symptom: r.symptom, cause: r.cause || '', tags: r.tags }));
+}
+function systemInstruction(authed) {
+  return SYS_PROMPT + '\n\nKNOWLEDGE BASE (match ONLY these ids):\n' + JSON.stringify(kbGrounding(authed));
+}
 
 // Anthropic-style messages -> Gemini "contents" (assistant -> model).
 // PII (mobile numbers, MIDs) is redacted before the text leaves for Google —
@@ -37,7 +65,9 @@ export default async function handler(req, res) {
   if (!key) return res.status(500).json({ error: 'Server missing GEMINI_API_KEY' });
 
   try {
-    const { system, messages, max_tokens } = req.body || {};
+    // NOTE: a client-supplied `system` is intentionally ignored — the server owns
+    // the prompt. We only take the conversation turns.
+    const { messages, max_tokens } = req.body || {};
     if (!Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ error: 'messages required' });
     }
@@ -45,10 +75,7 @@ export default async function handler(req, res) {
     const outTokens = Math.min(Math.max(Number(max_tokens) || 1000, 1), MAX_OUTPUT_TOKENS);
 
     const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
-    const generationConfig = { maxOutputTokens: outTokens, temperature: 0.2 };
-    // Only force strict JSON when there's a system prompt (the real diagnosis path);
-    // the lightweight capability probe sends no system and just checks for a 2xx.
-    if (system) generationConfig.responseMimeType = 'application/json';
+    const generationConfig = { maxOutputTokens: outTokens, temperature: 0.2, responseMimeType: 'application/json' };
     // 2.5 models enable "thinking" by default, which spends the output-token budget
     // and can truncate the JSON. This is a fast KB matcher, not a reasoning task —
     // disable thinking (only 2.5 supports thinkingConfig; older models would 400).
@@ -68,7 +95,7 @@ export default async function handler(req, res) {
         'HARM_CATEGORY_DANGEROUS_CONTENT',
       ].map((category) => ({ category, threshold: 'BLOCK_ONLY_HIGH' })),
     };
-    if (system) body.systemInstruction = { parts: [{ text: system }] };
+    body.systemInstruction = { parts: [{ text: systemInstruction(hasValidSecret(req)) }] };
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
     const ctrl = new AbortController();
