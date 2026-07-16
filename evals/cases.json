@@ -2,29 +2,163 @@
   "description": "Real-world L1 queries phrased the way an agent (or merchant) would type them, mapped to the KB record(s) that SHOULD win. Used by scripts/eval-kb.mjs to catch coverage gaps (no matching record) and searchability gaps (record exists but its symptom/tags don't contain the words people use). Add a case whenever a zero-result search shows up in Insights.",
   "topN": 3,
   "cases": [
-    { "q": "bill saved but no popup came to enter mobile number", "expect": ["ci-popup-missing"] },
-    { "q": "tally bills stuck in data folder not uploading to billfree", "expect": ["ci-notdeliver-nodata", "tally-billtransfer"] },
-    { "q": "printer error 0x709 cannot set as default printer", "expect": ["ci-0x709"] },
-    { "q": "cash drawer not opening after printing the bill", "expect": ["ci-cash-drawer"] },
-    { "q": "receipt is cut off at the bottom", "expect": ["ci-print-cutoff"] },
-    { "q": "print getting cut on the right side", "expect": ["ci-rightcut"] },
-    { "q": "bill printing on A4 instead of 3 inch thermal", "expect": ["ci-pagesize-a4a5", "busy-3inch", "marg-a4instead3"] },
-    { "q": "how do I install the universal setup utility", "expect": ["setup-universal"] },
-    { "q": "windows 7 dot net framework error while installing billfree setup", "expect": ["setup-universal"] },
-    { "q": "select billfree printer in busy", "expect": ["busy-select-printer"] },
-    { "q": "configure email in busy with gmail app password", "expect": ["busy-email"] },
-    { "q": "tally prime tdl to capture customer mobile number", "expect": ["tally-mobile-tdl", "tally-api-tdl"] },
-    { "q": "gofrugal thermal printer setup for billfree", "expect": ["gofrugal-thermal", "gofrugal-select-printer"] },
-    { "q": "marg printing cut on left side", "expect": ["marg-leftcut"] },
-    { "q": "marg erp api integration admin key kridhaverse", "expect": ["marg-api"] },
-    { "q": "zoho invoice not sending to billfree webhook", "expect": ["zoho-api"] },
-    { "q": "how does merchant signup and onboarding work to get a MID", "expect": ["onboarding"] },
-    { "q": "when do I escalate to L2 and what info to collect", "expect": ["appendix-escalation"] },
-    { "q": "cash memo font too small scaling tsprint remote desktop", "expect": ["ci-scaling", "ci-rdp"] },
-    { "q": "windows update stuck cannot install net framework", "expect": ["ci-net7"] },
-    { "q": "busy apply reward discount alt 3 loyalty", "expect": ["busy-api-config", "busy-api-discount"] },
-    { "q": "busy restore custom validation bcd demo mode dongle", "expect": ["busy-api-bcd"] },
-    { "q": "eshopaid printer manager set billfree windows", "expect": ["eshopaid-identify", "eshopaid-windows"] },
-    { "q": "acme document printing format select billfree", "expect": ["acme-printer"] }
+    {
+      "q": "bill saved but no popup came to enter mobile number",
+      "expect": [
+        "ci-popup-missing"
+      ]
+    },
+    {
+      "q": "tally bills stuck in data folder not uploading to billfree",
+      "expect": [
+        "ci-notdeliver-nodata",
+        "tally-billtransfer"
+      ]
+    },
+    {
+      "q": "printer error 0x709 cannot set as default printer",
+      "expect": [
+        "ci-0x709"
+      ]
+    },
+    {
+      "q": "cash drawer not opening after printing the bill",
+      "expect": [
+        "ci-cash-drawer"
+      ]
+    },
+    {
+      "q": "receipt is cut off at the bottom",
+      "expect": [
+        "ci-print-cutoff"
+      ]
+    },
+    {
+      "q": "print getting cut on the right side",
+      "expect": [
+        "ci-rightcut"
+      ]
+    },
+    {
+      "q": "bill printing on A4 instead of 3 inch thermal",
+      "expect": [
+        "ci-pagesize-a4a5",
+        "busy-3inch",
+        "marg-a4instead3"
+      ]
+    },
+    {
+      "q": "how do I install the universal setup utility",
+      "expect": [
+        "setup-universal"
+      ]
+    },
+    {
+      "q": "windows 7 dot net framework error while installing billfree setup",
+      "expect": [
+        "setup-universal"
+      ]
+    },
+    {
+      "q": "select billfree printer in busy",
+      "expect": [
+        "busy-select-printer"
+      ]
+    },
+    {
+      "q": "configure email in busy with gmail app password",
+      "expect": [
+        "busy-email"
+      ]
+    },
+    {
+      "q": "tally prime tdl to capture customer mobile number",
+      "expect": [
+        "tally-mobile-tdl",
+        "tally-api-tdl"
+      ]
+    },
+    {
+      "q": "gofrugal thermal printer setup for billfree",
+      "expect": [
+        "gofrugal-thermal",
+        "gofrugal-select-printer"
+      ]
+    },
+    {
+      "q": "marg printing cut on left side",
+      "expect": [
+        "marg-leftcut"
+      ]
+    },
+    {
+      "q": "marg erp api integration admin key kridhaverse",
+      "expect": [
+        "marg-api"
+      ]
+    },
+    {
+      "q": "zoho invoice not sending to billfree webhook",
+      "expect": [
+        "zoho-api"
+      ]
+    },
+    {
+      "q": "how does merchant signup and onboarding work to get a MID",
+      "expect": [
+        "onboarding"
+      ]
+    },
+    {
+      "q": "when do I escalate to L2 and what info to collect",
+      "expect": [
+        "appendix-escalation"
+      ]
+    },
+    {
+      "q": "cash memo font too small scaling tsprint remote desktop",
+      "expect": [
+        "ci-scaling",
+        "ci-rdp"
+      ]
+    },
+    {
+      "q": "windows update stuck cannot install net framework",
+      "expect": [
+        "ci-net7"
+      ]
+    },
+    {
+      "q": "busy apply reward discount alt 3 loyalty",
+      "expect": [
+        "busy-api-config",
+        "busy-api-discount"
+      ]
+    },
+    {
+      "q": "busy restore custom validation bcd demo mode dongle",
+      "expect": [
+        "busy-api-bcd"
+      ]
+    },
+    {
+      "q": "eshopaid printer manager set billfree windows",
+      "expect": [
+        "eshopaid-identify",
+        "eshopaid-windows"
+      ]
+    },
+    {
+      "q": "acme document printing format select billfree",
+      "expect": [
+        "acme-printer"
+      ]
+    },
+    {
+      "q": "qr code blank when forwarded through billfree but prints direct",
+      "expect": [
+        "ci-qr-forward-blank"
+      ]
+    }
   ]
 }
