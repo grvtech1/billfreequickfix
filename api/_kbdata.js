@@ -920,7 +920,8 @@ export const KB = {
       "last_verified": "2026-06",
       "visibility": "public",
       "related": [
-        "genesys-api"
+        "genesys-api",
+        "ci-qr-forward-blank"
       ]
     },
     {
@@ -2588,14 +2589,14 @@ export const KB = {
       "system": "Printing",
       "type": "error",
       "symptom": "QR / UPI 2D code prints blank via BillFree Forward Print, but prints fine when printing directly on the merchant's own printer",
-      "cause": "The QR is a DYNAMIC IMAGE the POS writes per bill and Crystal Reports loads by file name at render time (e.g. the UPIQRCodeImageName field in a Marg .rpt). When BillFree forwards the job it re-renders the report, and that per-bill image file is not available in the forward context, so the picture object loads nothing = a blank strip. A linear barcode on the same receipt keeps printing because it is a FONT (e.g. IDAutomation Code 39/128), which has no file dependency and survives the forward.",
+      "cause": "The QR is a DYNAMIC IMAGE the POS writes per bill and Crystal Reports loads by file name at render time (e.g. UPIQRCodeImageName in a Marg .rpt). BillFree captures the job correctly (the QR DOES appear on the WhatsApp digital bill), but its Forward Print step re-renders / re-spools to the physical printer and the per-bill QR image is gone by then, so it prints blank. A linear barcode on the same receipt keeps printing because it is a FONT (e.g. IDAutomation) with no file dependency. On a THERMAL printer the tell is sharper: fonts print but images drop = the job is going out in text mode, not raster.",
       "solution": [
-        "Confirm the pattern: a linear barcode still prints but the QR/2D code is blank ONLY through BillFree Forward Print. That difference means the QR is a dynamic image, not a font.",
-        "Ask the one diagnostic question: does the QR appear on the WhatsApp digital bill BillFree sends? It localises where the QR is being lost.",
-        "If the QR IS on the digital bill but blank on the forwarded paper: set the BillFree printer (or the forward target printer) to 'Print as image' / render as bitmap - Printer Properties > Advanced (or forward as PDF/image). This reprints the already-rendered page with the QR baked in as pixels instead of regenerating it. Fixes it in most cases.",
-        "If the QR is blank on BOTH the digital bill and the forwarded paper: the QR image file is not present during BillFree's render. The per-bill UPI QR image must persist / be reachable in BillFree's context, or use the fallback below.",
-        "Fallback that always works: in the POS, print the paper bill directly to the physical printer AND capture to BillFree (two print outputs) instead of using BillFree Forward Print. The QR is then rendered by the POS straight to paper and never passes through a re-render.",
-        "Do NOT try to fix this by editing the .rpt to embed the QR - a per-bill UPI QR is dynamic and cannot be made static. The fix is in the forward / print path, not the report."
+        "Confirm the pattern: a linear barcode still prints but the QR/2D code is blank ONLY through BillFree Forward Print. That means the QR is a dynamic image, not a font.",
+        "Check the WhatsApp digital bill BillFree sent. If the QR IS on the digital bill, BillFree captured it correctly and the loss is purely in the forward-to-printer step (this is the common case).",
+        "First try IF the option exists: set the BillFree / forward-target printer to 'Print as image' / render as bitmap (Printer Properties > Advanced). NOTE: most thermal drivers (e.g. POS-80C) and many Brother/HP drivers do NOT expose this option - if it is not there, skip it.",
+        "Robust fix - stop relying on the lossy forward. Printing DIRECTLY from the POS already produces a perfect receipt (QR included), so print the paper copy straight from the POS to the physical printer, and capture the digital bill through a NON-print path. For Marg specifically, switch to the Marg BillFree API integration (see marg-api) instead of the virtual printer + forward. This removes the re-render entirely and is a cleaner integration.",
+        "If Forward Print must stay: when the physical printer is a thermal (e.g. POS-80C), set it to graphics/raster mode, NOT text-only - fonts printing while the QR image drops is the classic text-mode symptom. Also, if BillFree can forward/reprint its GENERATED PDF (the same one used for the digital bill, which already has the QR) instead of re-spooling the raw job, use that.",
+        "Do NOT edit the .rpt to embed the QR - a per-bill UPI QR is dynamic and cannot be made static. The fix is always in the print / forward path, not the report."
       ],
       "tags": [
         "qr",
@@ -2619,7 +2620,8 @@ export const KB = {
       "related": [
         "setup-config-popup",
         "setup-printing-types",
-        "marg-leftcut"
+        "marg-leftcut",
+        "marg-api"
       ]
     }
   ],
