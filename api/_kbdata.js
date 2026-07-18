@@ -2669,6 +2669,20 @@ export const KB = {
         "setup-universal",
         "tally-select-printer",
         "tally-invoice-title"
+      ],
+      "images": [
+        {
+          "src": "kb-images/tally-bitmap-mode-1.jpg",
+          "caption": "Tally print screen - choose P: Print > Configuration to open Print Configuration."
+        },
+        {
+          "src": "kb-images/tally-bitmap-mode-2.jpg",
+          "caption": "Advanced Configurations: 'Use Bitmap Mode to print' is Yes - this is the cause (bill goes as an image, BillFree can't parse it)."
+        },
+        {
+          "src": "kb-images/tally-bitmap-mode-3.jpg",
+          "caption": "The fix: set 'Use Bitmap Mode to print' to No, then reprint."
+        }
       ]
     },
     {
@@ -2703,6 +2717,16 @@ export const KB = {
       "related": [
         "tally-api-tdl",
         "tally-bitmap-mode"
+      ],
+      "images": [
+        {
+          "src": "kb-images/tally-invoice-title-1.jpg",
+          "caption": "Header Information dialog - set Title to 'Tax Invoice'."
+        },
+        {
+          "src": "kb-images/tally-invoice-title-2.jpg",
+          "caption": "Print Configuration > Header Information > Title = Tax Invoice."
+        }
       ]
     }
   ],
