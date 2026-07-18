@@ -165,6 +165,12 @@
       "expect": [
         "tally-bitmap-mode"
       ]
+    },
+    {
+      "q": "tally digital bill showing invoice instead of tax invoice title",
+      "expect": [
+        "tally-invoice-title"
+      ]
     }
   ]
 }

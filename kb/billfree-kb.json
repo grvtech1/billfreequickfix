@@ -683,7 +683,10 @@
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "tally-invoice-title"
+      ]
     },
     {
       "id": "gofrugal-select-printer",
@@ -2662,7 +2665,42 @@
       "related": [
         "setup-printing-types",
         "setup-universal",
-        "tally-select-printer"
+        "tally-select-printer",
+        "tally-invoice-title"
+      ]
+    },
+    {
+      "id": "tally-invoice-title",
+      "category": "POS Integration",
+      "system": "Tally",
+      "type": "howto",
+      "symptom": "Tally (API integration) digital bill shows 'Invoice' instead of 'Tax Invoice' as the header title",
+      "cause": "The digital bill's header title is taken from Tally Prime's Print Configuration > Header Information > Title. If that Title is set to 'Invoice' (or left at a default), the BillFree digital bill shows 'Invoice' instead of 'Tax Invoice'.",
+      "solution": [
+        "In Tally Prime, open the sales voucher and press Ctrl+P (Print) to open the print screen.",
+        "Choose Configuration to open Print Configuration.",
+        "Scroll to the 'Header Information' section and select 'Title'.",
+        "Change the Title from 'Invoice' to 'Tax Invoice' (set Subtitle too if required).",
+        "Accept / save the configuration. The next digital bill now shows 'Tax Invoice' as the header."
+      ],
+      "tags": [
+        "tally",
+        "tally api",
+        "tax invoice",
+        "invoice title",
+        "header information",
+        "title",
+        "digital bill title",
+        "wrong title",
+        "invoice instead of tax invoice",
+        "print configuration"
+      ],
+      "level": "L1",
+      "last_verified": "2026-07",
+      "visibility": "public",
+      "related": [
+        "tally-api-tdl",
+        "tally-bitmap-mode"
       ]
     }
   ],
