@@ -96,7 +96,8 @@ export const KB = {
         "setup-printing-types",
         "setup-directory",
         "appendix-checklist",
-        "ci-cash-drawer"
+        "ci-cash-drawer",
+        "tally-bitmap-mode"
       ]
     },
     {
@@ -207,7 +208,8 @@ export const KB = {
         "ci-cash-drawer",
         "ci-pagesize-a4a5",
         "ci-pagesize-a5",
-        "ci-qr-forward-blank"
+        "ci-qr-forward-blank",
+        "tally-bitmap-mode"
       ]
     },
     {
@@ -545,7 +547,10 @@ export const KB = {
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "tally-bitmap-mode"
+      ]
     },
     {
       "id": "tally-billtransfer",
@@ -2622,6 +2627,44 @@ export const KB = {
         "setup-printing-types",
         "marg-leftcut",
         "marg-api"
+      ]
+    },
+    {
+      "id": "tally-bitmap-mode",
+      "category": "POS Integration",
+      "system": "Tally",
+      "type": "error",
+      "symptom": "Tally (Universal) bill is not readable / not parsing - the whole invoice comes through as an image, so BillFree can't auto-read the mobile number or fields",
+      "cause": "In Tally Prime's Print Configuration, 'Use Bitmap Mode to print' is set to Yes. Bitmap mode sends the invoice to the printer as a flat raster IMAGE instead of selectable text, so the BillFree Universal virtual printer captures a picture with no readable text fields (mobile number, amount, items) to parse.",
+      "solution": [
+        "In Tally Prime, open the invoice and press Ctrl+P (Print), or open Print Preview.",
+        "On the print menu choose P: Print > Configuration (Print Configuration opens).",
+        "In 'List of Configurations', scroll to the 'Advanced Configurations' section and find 'Use Bitmap Mode to print' (it will show Yes).",
+        "Set 'Use Bitmap Mode to print' to No.",
+        "Accept / save the configuration, then reprint the bill to the BillFree printer. The invoice now goes as text and BillFree can read the fields (mobile number, amount) again."
+      ],
+      "tags": [
+        "tally",
+        "tally universal",
+        "bitmap mode",
+        "use bitmap mode to print",
+        "not readable",
+        "image",
+        "not parsing",
+        "mobile not reading",
+        "auto read",
+        "print configuration",
+        "field not captured",
+        "blank data",
+        "format issue"
+      ],
+      "level": "L1",
+      "last_verified": "2026-07",
+      "visibility": "public",
+      "related": [
+        "setup-printing-types",
+        "setup-universal",
+        "tally-select-printer"
       ]
     }
   ],

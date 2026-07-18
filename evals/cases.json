@@ -159,6 +159,12 @@
       "expect": [
         "ci-qr-forward-blank"
       ]
+    },
+    {
+      "q": "tally universal bill coming as image not readable bitmap mode",
+      "expect": [
+        "tally-bitmap-mode"
+      ]
     }
   ]
 }
