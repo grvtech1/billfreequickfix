@@ -97,7 +97,8 @@ export const KB = {
         "setup-directory",
         "appendix-checklist",
         "ci-cash-drawer",
-        "tally-bitmap-mode"
+        "tally-bitmap-mode",
+        "ci-printer-driver"
       ]
     },
     {
@@ -209,7 +210,8 @@ export const KB = {
         "ci-pagesize-a4a5",
         "ci-pagesize-a5",
         "ci-qr-forward-blank",
-        "tally-bitmap-mode"
+        "tally-bitmap-mode",
+        "ci-printer-driver"
       ]
     },
     {
@@ -2025,7 +2027,10 @@ export const KB = {
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "ci-printer-driver"
+      ]
     },
     {
       "id": "ci-printer-props",
@@ -2144,7 +2149,8 @@ export const KB = {
         "ci-a5-portrait",
         "marg-a4instead3",
         "ci-pagesize-a5",
-        "ci-print-cutoff"
+        "ci-print-cutoff",
+        "ci-printer-driver"
       ]
     },
     {
@@ -2504,7 +2510,10 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "ci-printer-driver"
+      ]
     },
     {
       "id": "appendix-escalation",
@@ -2727,6 +2736,63 @@ export const KB = {
           "src": "kb-images/tally-invoice-title-2.jpg",
           "caption": "Print Configuration > Header Information > Title = Tax Invoice."
         }
+      ]
+    },
+    {
+      "id": "ci-printer-driver",
+      "category": "Common Issue",
+      "system": "Printer",
+      "type": "howto",
+      "symptom": "Which driver to use for the BillFree virtual printer, how to install it, and how to make a custom (long) paper size for thermal / long bills",
+      "cause": "The BillFree 'printer' is a virtual CAPTURE printer - the POS prints to it and BillFree grabs the job as XPS to build the digital bill. The right base driver depends on the setup (local vs RDP / printer redirection) and the receipt length, and long or thermal bills need a custom paper size so nothing is clipped.",
+      "solution": [
+        "CHOOSE THE DRIVER by use case. Normal-length bills, OR RDP / printer redirection: use the Microsoft XPS Class Driver (or Microsoft OpenXPS Class Driver 2). It is XPS-native (clean capture), always available without Windows Update, and redirects cleanly over RDP.",
+        "Long receipts that EXCEED ~14 inches (longer than Legal): use an HP DesignJet V4 driver - only it supports custom / long page sizes. The Microsoft class drivers are Letter/A4 only and will clip long bills.",
+        "Between DesignJet options: HP DesignJet T2600 V4 is the safe default (most common, most stable, best match for BillFree's parser). Choose HP DesignJet Z9+ Pro V4 (or Z6800 V4) only if the long bill carries a QR / logo and you want the cleanest raster capture. Both handle receipt lengths far beyond 14 inches. Avoid HP DesignJet Z2100 (not V4) and HP Ink Tank / PCL-3 drivers as the base.",
+        "INSTALL - preferred: run BillFree's own InstallPrinter script from C:\\BillFree\\Support\\ (e.g. InstallPrinter_Win10.bat) as Administrator. It creates the 'BillFree' printer with the exact driver BillFree expects - use this whenever possible.",
+        "INSTALL - manual (if the script is missing): Control Panel > Devices and Printers > Add a printer > 'The printer that I want isn't listed' > 'Add a local printer'. Keep the port BillFree uses.",
+        "On 'Install the printer driver': for the Microsoft class driver pick Manufacturer 'Microsoft' > 'Microsoft XPS Class Driver' (no Windows Update needed). For a DesignJet, click 'Windows Update' first (wait a few minutes for the catalogue to load), then Manufacturer 'HP' > 'HP DesignJet T2600 V4' - or use 'Have Disk' with the DesignJet .inf downloaded from HP. Name the printer as BillFree expects (usually 'BillFree').",
+        "CREATE A CUSTOM PAPER SIZE (for thermal / long bills): open Print Server Properties (Devices and Printers > select any printer > 'Print server properties', or run  printui /s /t2  and open the Forms tab).",
+        "Tick 'Create a new form'. Name it (e.g. 'BillFree Thermal 80mm'). Set Width = receipt width (80mm thermal = 8.0 cm / 3.15 in), and Height/Length = generous (e.g. 100 in) so long bills never clip. Click Save Form.",
+        "Open the BillFree printer > Printing Preferences / Advanced > set Paper Size to the custom form you just created, and set it as the default.",
+        "VERIFY: print one real LONG bill through BillFree and confirm (a) nothing is clipped at the bottom - totals, QR and terms all present, and (b) the mobile number + fields still parse into the digital bill. That two-point check is the only proof the driver + paper size are correct."
+      ],
+      "tags": [
+        "printer driver",
+        "xps driver",
+        "which printer",
+        "which driver",
+        "designjet",
+        "t2600",
+        "z9+ pro",
+        "z6800",
+        "microsoft xps class driver",
+        "openxps class driver",
+        "custom paper size",
+        "create custom paper size",
+        "long bill",
+        "thermal",
+        "80mm",
+        "printer install",
+        "install printer",
+        "print server properties",
+        "forms",
+        "printer redirection",
+        "rdp",
+        "clipped",
+        "page size",
+        "have disk",
+        "windows update"
+      ],
+      "level": "L1",
+      "last_verified": "2026-07",
+      "visibility": "public",
+      "related": [
+        "setup-universal",
+        "setup-printing-types",
+        "ci-printer-install",
+        "ci-pagesize-a4a5",
+        "ci-rdp"
       ]
     }
   ],

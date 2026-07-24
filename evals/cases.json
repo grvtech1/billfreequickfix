@@ -171,6 +171,18 @@
       "expect": [
         "tally-invoice-title"
       ]
+    },
+    {
+      "q": "which driver to use for billfree printer xps or designjet",
+      "expect": [
+        "ci-printer-driver"
+      ]
+    },
+    {
+      "q": "how to make custom paper size for long thermal bill billfree printer",
+      "expect": [
+        "ci-printer-driver"
+      ]
     }
   ]
 }
