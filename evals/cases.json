@@ -183,6 +183,12 @@
       "expect": [
         "ci-printer-driver"
       ]
+    },
+    {
+      "q": "crystal report cash memo cut from left side on thermal print margin fix",
+      "expect": [
+        "marg-leftcut"
+      ]
     }
   ]
 }

@@ -833,27 +833,39 @@ export const KB = {
       "category": "POS Integration",
       "system": "Marg",
       "type": "printing",
-      "symptom": "Print cut from left side in 3-inch format (Marg)",
-      "cause": "Borderless/paper type not set.",
+      "symptom": "Print cut from the left side on the physical thermal receipt (Marg 3-inch cash memo) - digital bill is fine",
+      "cause": "The left-cut is on the PHYSICAL print only; the digital bill is unaffected because BillFree rebuilds it from the parsed text. The report's leftmost content sits at the very edge (left margin = 0), inside the printer's non-printable 'dead zone' (a 2-4 mm strip most printers physically cannot print), so those characters clip. It can also happen when the report is wider than the printer's printable area.",
       "solution": [
-        "BillFree Printer Setting > General Option > Preferences.",
-        "Set Borderless ON; Paper type = HP Photo papers.",
-        "Repeat the same in Advanced Option.",
-        "Print to verify."
+        "Understand first: the cut is on the paper only - the digital bill is correct (BillFree rebuilds it from parsed text). So fix the physical layout, and do NOT touch the DesignJet/XPS capture printer or the capture page size.",
+        "BEST fix (printer-independent, field-verified): in the report - Crystal Reports > File > Page Setup - set a small LEFT MARGIN instead of 0. About 0.02 in works (0.023 in fixed a 3-inch Marg cash memo); go up toward 0.10-0.15 in if a larger printer eats more of the edge. Alternatively, in Design view select the objects (Ctrl+A) and nudge them right ~0.1 in. This shifts content off the dead zone. Reprint and confirm the leftmost characters (DOC.NO, the serial numbers) are fully visible - and that the right side ('Net' column) did not start clipping.",
+        "Alternative, HP INKJET printers only: BillFree Printer Setting > General Option > Preferences > Borderless ON, Paper type = HP Photo papers; repeat in Advanced Option. NOTE: 'Borderless' is NOT available on DesignJet (XPS capture) drivers or on true thermal drivers - on those, use the report left-margin fix above.",
+        "If the report is wider than the printable area (e.g. a 3.11 in design on an 80 mm printer that only prints ~2.83 in / 72 mm), also reduce the design width so nothing overflows either edge.",
+        "If the paper prints via BillFree Forward Print: BillFree Config > Custom Scaling = Yes > Left Margin (pixels) > increase (~10-20 px) to push content right (see ci-rightcut for the same lever)."
       ],
       "tags": [
         "marg",
         "3inch",
         "borderless",
-        "left cut"
+        "left cut",
+        "left side cut",
+        "crystal report",
+        "page setup",
+        "left margin",
+        "cash memo",
+        "thermal",
+        "printable area",
+        "dead zone",
+        "designjet"
       ],
       "level": "L1",
       "images": [],
-      "last_verified": "2026-05",
+      "last_verified": "2026-08",
       "visibility": "public",
       "related": [
         "ci-mfp-noprint",
-        "ci-qr-forward-blank"
+        "ci-qr-forward-blank",
+        "ci-rightcut",
+        "ci-printer-driver"
       ]
     },
     {
@@ -2441,7 +2453,10 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "marg-leftcut"
+      ]
     },
     {
       "id": "ci-scaling",
@@ -2792,7 +2807,8 @@ export const KB = {
         "setup-printing-types",
         "ci-printer-install",
         "ci-pagesize-a4a5",
-        "ci-rdp"
+        "ci-rdp",
+        "marg-leftcut"
       ]
     }
   ],
