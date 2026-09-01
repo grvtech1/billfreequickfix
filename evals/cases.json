@@ -189,6 +189,12 @@
       "expect": [
         "marg-leftcut"
       ]
+    },
+    {
+      "q": "right side cut on 3 inch bill after autoprint mode off fixed by custom paper size",
+      "expect": [
+        "ci-rightcut"
+      ]
     }
   ]
 }

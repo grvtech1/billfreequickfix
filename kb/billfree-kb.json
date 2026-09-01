@@ -2249,7 +2249,8 @@
       "related": [
         "ci-pagesize-a4a5",
         "ci-pagesize-a5",
-        "setup-config-popup"
+        "setup-config-popup",
+        "ci-rightcut"
       ]
     },
     {
@@ -2432,28 +2433,41 @@
       "category": "Common Issue",
       "system": "Printing",
       "type": "error",
-      "symptom": "Print is coming but cutting from the right side",
-      "cause": "AutoPrintMode setting.",
+      "symptom": "Print comes but cuts from the RIGHT side (3-inch bill)",
+      "cause": "The right edge is clipped. Usually the BillFree AutoPrintMode setting - but it can also APPEAR after AutoPrintMode is turned off, because the print then relies on the Windows paper size (form), and if that form does not match the 3-inch bill width the right side overflows and clips.",
       "solution": [
-        "Set AutoPrintMode = NO/false in the comp during BillFree configuration. This works in most cases."
+        "First (fixes most cases): in the BillFree configuration on that PC (comp), set AutoPrintMode = NO/false.",
+        "If the right-cut PERSISTS - or newly APPEARS right after you turn AutoPrintMode off - define a CUSTOM PAPER SIZE that matches the bill (the print now uses the Windows form). Devices and Printers > Print Server Properties > Forms tab > tick 'Create a new form' (this is the 'customer paper size' section): set Width = 3.00 in, Height = your bill length (e.g. 13.90 in), Printer area margins Left/Top/Bottom = 0 and Right ~0.06 in. Click Save Form, then set this form as the printer's default paper size. Reprint and confirm the right column (e.g. 'Net'/amount) is fully visible. (Field-verified: HP Impact IHR810 thermal, 3-inch bill.)",
+        "Alternative BillFree lever: Custom Scaling = Yes > reduce Y-height and/or adjust Left Margin (pixels) to pull content in (see the screenshot)."
       ],
       "tags": [
         "print",
         "right cut",
+        "right side cut",
         "autoprintmode",
-        "comp"
+        "auto print mode",
+        "comp",
+        "custom paper size",
+        "customer paper size",
+        "print server properties",
+        "forms",
+        "3inch",
+        "impact ihr810",
+        "paper size"
       ],
       "level": "L1",
       "images": [
         {
           "src": "kb-images/ci-rightcut-1.jpg",
-          "caption": ""
+          "caption": "BillFree Config - Custom Scaling: reduce Y-height / adjust Left Margin to pull content in and fix a right-cut."
         }
       ],
-      "last_verified": "2026-05",
+      "last_verified": "2026-08",
       "visibility": "public",
       "related": [
-        "marg-leftcut"
+        "marg-leftcut",
+        "ci-printer-driver",
+        "ci-print-cutoff"
       ]
     },
     {
@@ -2806,7 +2820,8 @@
         "ci-printer-install",
         "ci-pagesize-a4a5",
         "ci-rdp",
-        "marg-leftcut"
+        "marg-leftcut",
+        "ci-rightcut"
       ]
     }
   ],
