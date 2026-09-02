@@ -2252,7 +2252,8 @@ export const KB = {
         "ci-pagesize-a4a5",
         "ci-pagesize-a5",
         "setup-config-popup",
-        "ci-rightcut"
+        "ci-rightcut",
+        "ci-longbill-split"
       ]
     },
     {
@@ -2469,7 +2470,8 @@ export const KB = {
       "related": [
         "marg-leftcut",
         "ci-printer-driver",
-        "ci-print-cutoff"
+        "ci-print-cutoff",
+        "ci-longbill-split"
       ]
     },
     {
@@ -2823,7 +2825,48 @@ export const KB = {
         "ci-pagesize-a4a5",
         "ci-rdp",
         "marg-leftcut",
-        "ci-rightcut"
+        "ci-rightcut",
+        "ci-longbill-split"
+      ]
+    },
+    {
+      "id": "ci-longbill-split",
+      "category": "Common Issue",
+      "system": "Printing",
+      "type": "printing",
+      "symptom": "Long bill prints in two parts / splits across pages on a 3-inch (thermal) printer - digital bill is full and correct",
+      "cause": "The physical printer's paper size (form) LENGTH is set too short for a long bill, so the print overflows onto a second part/page. The digital bill is full because BillFree rebuilds it from the parsed data - so the split is purely the printer's paper-length limit, not a BillFree problem.",
+      "solution": [
+        "Confirm it is the printer, not BillFree: the digital bill is full and correct, and only the PHYSICAL print splits into two parts. So the fix is on the printer paper length.",
+        "Increase the paper LENGTH in the custom paper size (form): Devices and Printers > Print Server Properties > Forms tab > select or create the 3-inch form (the 'customer paper size' section) > set Height / Length to a higher value (e.g. 24-40 in, generous for a long roll) so the whole bill fits on one continuous strip. Click Save Form, then set this form as the printer's default paper size.",
+        "Also set the same (or longer) length in the printer Printing Preferences > paper size, if the driver keeps its own list; and keep the BillFree capture form long too (e.g. the 3.15 x 36 in capture) so both sides match.",
+        "Reprint a long bill and confirm it comes out as one continuous receipt, not two parts."
+      ],
+      "tags": [
+        "long bill",
+        "two parts",
+        "two pages",
+        "split",
+        "splitting",
+        "breaks into two",
+        "thermal",
+        "3inch",
+        "paper length",
+        "increase length",
+        "custom paper size",
+        "customer paper size",
+        "form",
+        "print server properties",
+        "page length",
+        "roll"
+      ],
+      "level": "L1",
+      "last_verified": "2026-08",
+      "visibility": "public",
+      "related": [
+        "ci-printer-driver",
+        "ci-rightcut",
+        "ci-print-cutoff"
       ]
     }
   ],

@@ -195,6 +195,12 @@
       "expect": [
         "ci-rightcut"
       ]
+    },
+    {
+      "q": "long bill printing in two parts on thermal digital bill is full increase printer paper length",
+      "expect": [
+        "ci-longbill-split"
+      ]
     }
   ]
 }
