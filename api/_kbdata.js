@@ -99,7 +99,10 @@ export const KB = {
         "ci-cash-drawer",
         "tally-bitmap-mode",
         "ci-printer-driver",
-        "ci-print-crash"
+        "ci-print-crash",
+        "tally-billtransfer",
+        "wizapp-phase1",
+        "ci-util-install"
       ]
     },
     {
@@ -128,7 +131,8 @@ export const KB = {
       "visibility": "public",
       "related": [
         "setup-universal",
-        "popup-delivery-options"
+        "popup-delivery-options",
+        "appendix-glossary"
       ]
     },
     {
@@ -215,7 +219,9 @@ export const KB = {
         "ci-printer-driver",
         "ci-blackbar-preview",
         "ci-webpos-parsing",
-        "print-triage"
+        "print-triage",
+        "busy-mobile-field",
+        "tally-mobile-tdl"
       ]
     },
     {
@@ -339,17 +345,19 @@ export const KB = {
       "images": [
         {
           "src": "kb-images/busy-select-printer-1.jpg",
-          "caption": ""
+          "caption": "Step 1: Standard Format: Administrator > Configuration > Hardware Configuration."
         },
         {
           "src": "kb-images/busy-select-printer-2.jpg",
-          "caption": ""
+          "caption": "Step 2: Non-Standard Format: Administrator > Configuration > Invoice/Document Printing > Advanced Printing."
         }
       ],
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "print-triage"
+        "print-triage",
+        "busy-mobile-field",
+        "busy-email"
       ]
     },
     {
@@ -448,7 +456,11 @@ export const KB = {
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "busy-select-printer",
+        "setup-printing-types"
+      ]
     },
     {
       "id": "busy-email",
@@ -478,39 +490,43 @@ export const KB = {
       "images": [
         {
           "src": "kb-images/busy-email-1.jpg",
-          "caption": ""
+          "caption": "Step 1: Prereqs: Gmail ID must match the user MID; POS Type 'Busy' selected in BillFree backend; 2-Step Verification ON in Go…"
         },
         {
           "src": "kb-images/busy-email-2.jpg",
-          "caption": ""
+          "caption": "Step 2: Generate Google App Password: Gmail > Manage Google Account > Security > App Passwords. Name it (e.g. 'Busy_Email'), …"
         },
         {
           "src": "kb-images/busy-email-3.jpg",
-          "caption": ""
+          "caption": "Step 3: Busy: Administration > Configuration > Email Configuration. Check 'Send Directly' and 'PDF+XML Attachment' (invoice o…"
         },
         {
           "src": "kb-images/busy-email-4.jpg",
-          "caption": ""
+          "caption": "Step 4: SMTP Server: smtp.gmail.com | Username: merchant Gmail ID | Password: paste 16-char App Password."
         },
         {
           "src": "kb-images/busy-email-5.jpg",
-          "caption": ""
+          "caption": "Step 5: From: Merchant Name | Reply To: Merchant Email ID."
         },
         {
           "src": "kb-images/busy-email-6.jpg",
-          "caption": ""
+          "caption": "Step 6: Administration > Configuration > Vouchers Configuration > Sales > Main > Voucher Configuration."
         },
         {
           "src": "kb-images/busy-email-7.jpg",
-          "caption": ""
+          "caption": "Step 7: Set 'Separate Billing Details' = Y; 'Specify key field' = Mobile No.; 'Send Email After Saving' = Y."
         },
         {
           "src": "kb-images/busy-email-8.jpg",
-          "caption": ""
+          "caption": "Step 8: Email format: Standard. Prompt for sending email: Y (set N to auto-send). Show email options: Y. Send to Party: Y. BC…"
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "busy-api-config",
+        "busy-select-printer"
+      ]
     },
     {
       "id": "tally-mobile-tdl",
@@ -534,7 +550,12 @@ export const KB = {
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "tally-api-tdl",
+        "tally-select-printer",
+        "setup-printing-types"
+      ]
     },
     {
       "id": "tally-select-printer",
@@ -561,7 +582,9 @@ export const KB = {
       "visibility": "public",
       "related": [
         "tally-bitmap-mode",
-        "print-triage"
+        "print-triage",
+        "tally-mobile-tdl",
+        "tally-billtransfer"
       ]
     },
     {
@@ -637,7 +660,13 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "tally-api-tdl",
+        "tally-select-printer",
+        "setup-universal",
+        "ci-notdeliver-nodata"
+      ]
     },
     {
       "id": "tally-api-tdl",
@@ -699,7 +728,10 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "tally-invoice-title"
+        "tally-invoice-title",
+        "tally-mobile-tdl",
+        "tally-billtransfer",
+        "api-flow"
       ]
     },
     {
@@ -956,7 +988,8 @@ export const KB = {
       "visibility": "public",
       "related": [
         "genesys-api",
-        "ci-qr-forward-blank"
+        "ci-qr-forward-blank",
+        "api-flow"
       ]
     },
     {
@@ -982,19 +1015,19 @@ export const KB = {
       "images": [
         {
           "src": "kb-images/zorder-select-1.jpg",
-          "caption": ""
+          "caption": "Step 1: Zorder > Tools > Options (Printer Settings)."
         },
         {
           "src": "kb-images/zorder-select-2.jpg",
-          "caption": ""
+          "caption": "Step 2: Click Printer Settings; you'll see the list of formats and selected printers."
         },
         {
           "src": "kb-images/zorder-select-3.jpg",
-          "caption": ""
+          "caption": "Step 3: Select the format, select the BillFree printer and page size."
         },
         {
           "src": "kb-images/zorder-select-4.jpg",
-          "caption": ""
+          "caption": "Step 4: Test by giving a print command in Zorder."
         }
       ],
       "last_verified": "2026-05",
@@ -1027,23 +1060,23 @@ export const KB = {
       "images": [
         {
           "src": "kb-images/shopper-select-1.jpg",
-          "caption": ""
+          "caption": "Step 1: Open Shopper logged in as admin/main user."
         },
         {
           "src": "kb-images/shopper-select-2.jpg",
-          "caption": ""
+          "caption": "Step 2: Print Engine Configuration > Configure Specific Transaction."
         },
         {
           "src": "kb-images/shopper-select-3.jpg",
-          "caption": ""
+          "caption": "Step 3: Sales > Sales Transaction > click the selected template/format."
         },
         {
           "src": "kb-images/shopper-select-4.jpg",
-          "caption": ""
+          "caption": "Step 4: Click Parameters > printer selection setting > select BillFree printer, then Save (Windows printing)."
         },
         {
           "src": "kb-images/shopper-select-5.jpg",
-          "caption": ""
+          "caption": "Step 5: For text printing: select their printer and choose DOS Printing."
         }
       ],
       "last_verified": "2026-05",
@@ -1170,7 +1203,11 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "wizapp-phase2",
+        "setup-universal"
+      ]
     },
     {
       "id": "wizapp-phase2",
@@ -1213,7 +1250,10 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "wizapp-phase1"
+      ]
     },
     {
       "id": "drishti-select",
@@ -1295,7 +1335,10 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "eshopaid-windows"
+      ]
     },
     {
       "id": "eshopaid-windows",
@@ -1320,7 +1363,8 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "print-triage"
+        "print-triage",
+        "eshopaid-identify"
       ]
     },
     {
@@ -1443,7 +1487,15 @@ export const KB = {
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "zoho-api",
+        "quickbill-api",
+        "genesys-api",
+        "marg-api",
+        "tally-api-tdl",
+        "petpooja-api"
+      ]
     },
     {
       "id": "zoho-api",
@@ -1520,7 +1572,10 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "api-flow"
+      ]
     },
     {
       "id": "quickbill-api",
@@ -1571,7 +1626,10 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "api-flow"
+      ]
     },
     {
       "id": "genesys-api",
@@ -1599,7 +1657,8 @@ export const KB = {
       "visibility": "public",
       "related": [
         "marg-config",
-        "marg-api"
+        "marg-api",
+        "api-flow"
       ]
     },
     {
@@ -1623,7 +1682,10 @@ export const KB = {
       ],
       "level": "L1",
       "images": [],
-      "visibility": "internal"
+      "visibility": "internal",
+      "related": [
+        "api-flow"
+      ]
     },
     {
       "id": "busy-api-install",
@@ -1842,19 +1904,19 @@ export const KB = {
       "images": [
         {
           "src": "kb-images/busy-api-vsg-1.jpg",
-          "caption": ""
+          "caption": "Step 1: Administration > Configuration > Voucher Series Configuration > Sale > Voucher Series Group Management."
         },
         {
           "src": "kb-images/busy-api-vsg-2.jpg",
-          "caption": ""
+          "caption": "Step 2: Create a new Voucher Series Group named 'BillFree'."
         },
         {
           "src": "kb-images/busy-api-vsg-4.jpg",
-          "caption": ""
+          "caption": "Step 3: Add required Sale Voucher Series to this group; save."
         },
         {
           "src": "kb-images/busy-api-vsg-3.jpg",
-          "caption": ""
+          "caption": "Step 4: Only voucher series in this group will trigger the BillFree Loyalty form during billing."
         }
       ],
       "last_verified": "2026-05",
@@ -1914,7 +1976,8 @@ export const KB = {
         "busy-api-billship",
         "busy-api-vsg",
         "busy-api-discount",
-        "busy-api-digitalbill"
+        "busy-api-digitalbill",
+        "busy-email"
       ]
     },
     {
@@ -2024,7 +2087,8 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "ci-print-crash"
+        "ci-print-crash",
+        "ci-util-install"
       ]
     },
     {
@@ -2049,7 +2113,12 @@ export const KB = {
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "setup-universal",
+        "ci-net7",
+        "ci-printer-install"
+      ]
     },
     {
       "id": "ci-printer-install",
@@ -2079,7 +2148,8 @@ export const KB = {
       "related": [
         "ci-printer-driver",
         "ci-print-crash",
-        "print-triage"
+        "print-triage",
+        "ci-util-install"
       ]
     },
     {
@@ -2351,7 +2421,8 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "ci-notdeliver-data"
+        "ci-notdeliver-data",
+        "tally-billtransfer"
       ]
     },
     {
@@ -2632,7 +2703,8 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "internal",
       "related": [
-        "ci-print-crash"
+        "ci-print-crash",
+        "appendix-glossary"
       ]
     },
     {
@@ -2662,7 +2734,8 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "setup-universal"
+        "setup-universal",
+        "appendix-glossary"
       ]
     },
     {
@@ -2693,7 +2766,12 @@ export const KB = {
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "appendix-checklist",
+        "appendix-escalation",
+        "setup-flow"
+      ]
     },
     {
       "id": "ci-qr-forward-blank",

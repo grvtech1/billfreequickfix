@@ -59,11 +59,11 @@ This is an internal L1 agent tool: it shows every record, including internal-onl
 (dongle/license steps, backend MID checks — flagged `visibility: internal`). The AI endpoint
 also spends your Gemini API quota.
 
-> ⚠️ **The KB file itself (`/billfree-kb.json`) is served statically, so it is world-readable
-> regardless of the shared secret** — the secret only gates the `/api/*` functions, not static
-> assets. For genuinely sensitive material, **Vercel Deployment Protection is the only real
-> lock.** (No plaintext credentials live in the KB anymore — the Busy password was removed and
-> now references the L2 secrets vault.)
+> ℹ️ The KB is **no longer a static file** — it is served by the gated `/api/kb` function, and records
+> flagged `visibility: internal` are returned **only** to callers presenting the shared secret (fail-closed).
+> The remaining limits: the shared secret ships in the client (a strong deterrent, not real auth), and if
+> this GitHub repo is public the internal records are visible there. For genuinely sensitive material,
+> **Vercel Deployment Protection** remains the only real lock. (No plaintext credentials live in the KB.)
 
 Pick your protection:
 - **Vercel password protection** (Pro, strongest): Settings → Deployment Protection → Password.
@@ -113,7 +113,7 @@ that present a valid secret.
 ### Adding / fixing screenshots
 Drop images in `public/kb-images/` and reference them in a record:
 `"images": [{"src": "kb-images/your-file.jpg", "caption": "optional"}]`.
-The current 133 were auto-mapped from the source doc by section heading — spot-check and
+The current 149 were auto-mapped from the source doc by section heading — spot-check and
 recaption as needed.
 
 ## Features
@@ -128,3 +128,4 @@ recaption as needed.
 - Insights dashboard (KV-gated): top searches, **zero-result KB gaps**, most-opened fixes,
   AI volume, re-authoring queue.
 - Offline-safe: search + guided triage work with no API at all.
+- Keyboard-first: `/` search, `↑↓` move + preview, `Enter` open, `Alt+A` Ask AI, `Alt+T` guided triage, `Esc` back. Dark mode toggle; pinned + recent fixes on the landing; stale badge shown in the result list; one-click Escalate copy in every fix.
