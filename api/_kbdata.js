@@ -98,7 +98,8 @@ export const KB = {
         "appendix-checklist",
         "ci-cash-drawer",
         "tally-bitmap-mode",
-        "ci-printer-driver"
+        "ci-printer-driver",
+        "ci-print-crash"
       ]
     },
     {
@@ -211,7 +212,10 @@ export const KB = {
         "ci-pagesize-a5",
         "ci-qr-forward-blank",
         "tally-bitmap-mode",
-        "ci-printer-driver"
+        "ci-printer-driver",
+        "ci-blackbar-preview",
+        "ci-webpos-parsing",
+        "print-triage"
       ]
     },
     {
@@ -343,7 +347,10 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "print-triage"
+      ]
     },
     {
       "id": "busy-a5",
@@ -391,7 +398,8 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "marg-a4instead3"
+        "marg-a4instead3",
+        "print-triage"
       ]
     },
     {
@@ -415,7 +423,8 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "busy-a5"
+        "busy-a5",
+        "print-triage"
       ]
     },
     {
@@ -551,7 +560,8 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "tally-bitmap-mode"
+        "tally-bitmap-mode",
+        "print-triage"
       ]
     },
     {
@@ -717,7 +727,8 @@ export const KB = {
       "visibility": "public",
       "related": [
         "gofrugal-thermal",
-        "gofrugal2-select"
+        "gofrugal2-select",
+        "print-triage"
       ]
     },
     {
@@ -865,7 +876,8 @@ export const KB = {
         "ci-mfp-noprint",
         "ci-qr-forward-blank",
         "ci-rightcut",
-        "ci-printer-driver"
+        "ci-printer-driver",
+        "print-triage"
       ]
     },
     {
@@ -891,7 +903,8 @@ export const KB = {
       "visibility": "public",
       "related": [
         "busy-3inch",
-        "ci-pagesize-a4a5"
+        "ci-pagesize-a4a5",
+        "print-triage"
       ]
     },
     {
@@ -985,7 +998,10 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "print-triage"
+      ]
     },
     {
       "id": "shopper-select",
@@ -1031,7 +1047,10 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "print-triage"
+      ]
     },
     {
       "id": "logics-select",
@@ -1074,7 +1093,10 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "print-triage"
+      ]
     },
     {
       "id": "wizapp-phase1",
@@ -1215,7 +1237,8 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "monark-select"
+        "monark-select",
+        "print-triage"
       ]
     },
     {
@@ -1240,7 +1263,8 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "drishti-select"
+        "drishti-select",
+        "print-triage"
       ]
     },
     {
@@ -1294,7 +1318,10 @@ export const KB = {
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "print-triage"
+      ]
     },
     {
       "id": "acme-printer",
@@ -1337,7 +1364,10 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "print-triage"
+      ]
     },
     {
       "id": "arnon-printer",
@@ -1385,7 +1415,10 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "print-triage"
+      ]
     },
     {
       "id": "api-flow",
@@ -1989,7 +2022,10 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "ci-print-crash"
+      ]
     },
     {
       "id": "ci-util-install",
@@ -2041,7 +2077,9 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "ci-printer-driver"
+        "ci-printer-driver",
+        "ci-print-crash",
+        "print-triage"
       ]
     },
     {
@@ -2071,7 +2109,8 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "ci-cash-drawer"
+        "ci-cash-drawer",
+        "print-triage"
       ]
     },
     {
@@ -2162,7 +2201,8 @@ export const KB = {
         "marg-a4instead3",
         "ci-pagesize-a5",
         "ci-print-cutoff",
-        "ci-printer-driver"
+        "ci-printer-driver",
+        "print-triage"
       ]
     },
     {
@@ -2209,7 +2249,8 @@ export const KB = {
         "setup-config-popup",
         "setup-printing-types",
         "ci-a5-portrait",
-        "ci-print-cutoff"
+        "ci-print-cutoff",
+        "print-triage"
       ]
     },
     {
@@ -2253,7 +2294,8 @@ export const KB = {
         "ci-pagesize-a5",
         "setup-config-popup",
         "ci-rightcut",
-        "ci-longbill-split"
+        "ci-longbill-split",
+        "print-triage"
       ]
     },
     {
@@ -2279,7 +2321,10 @@ export const KB = {
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "print-triage"
+      ]
     },
     {
       "id": "ci-notdeliver-nodata",
@@ -2314,7 +2359,7 @@ export const KB = {
       "category": "Common Issue",
       "system": "Delivery",
       "type": "error",
-      "symptom": "Bills not delivering to BillFree — bills ARE uploading from Data folder",
+      "symptom": "Bills not reaching the customer although files ARE uploading fine (present in Data folder, reaching the server) - delivery fails after upload",
       "cause": "Large PDF size (upload timeout) or wrong POS configured in backend (L2: needs log/backend analysis if steps below don't resolve).",
       "solution": [
         "Cause 4 (large PDF): check C:\\BillFree\\Data; large multi-MB PDFs (often a high-res logo) cause timeouts. Ask merchant to use a smaller optimized image.",
@@ -2325,7 +2370,16 @@ export const KB = {
         "timeout",
         "pdf size",
         "logo",
-        "backend pos"
+        "backend pos",
+        "uploading fine",
+        "files present",
+        "uploaded",
+        "reaching server",
+        "not received",
+        "customer not receiving",
+        "delivery fails after upload",
+        "data folder has files",
+        "server side"
       ],
       "level": "L2",
       "images": [],
@@ -2397,7 +2451,8 @@ export const KB = {
       "visibility": "public",
       "related": [
         "ci-pagesize-a4a5",
-        "ci-pagesize-a5"
+        "ci-pagesize-a5",
+        "print-triage"
       ]
     },
     {
@@ -2428,7 +2483,8 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "marg-leftcut"
+        "marg-leftcut",
+        "print-triage"
       ]
     },
     {
@@ -2471,7 +2527,8 @@ export const KB = {
         "marg-leftcut",
         "ci-printer-driver",
         "ci-print-cutoff",
-        "ci-longbill-split"
+        "ci-longbill-split",
+        "print-triage"
       ]
     },
     {
@@ -2508,7 +2565,10 @@ export const KB = {
         }
       ],
       "last_verified": "2026-05",
-      "visibility": "public"
+      "visibility": "public",
+      "related": [
+        "print-triage"
+      ]
     },
     {
       "id": "ci-rdp",
@@ -2543,7 +2603,8 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "ci-printer-driver"
+        "ci-printer-driver",
+        "print-triage"
       ]
     },
     {
@@ -2569,7 +2630,10 @@ export const KB = {
       "level": "L1",
       "images": [],
       "last_verified": "2026-05",
-      "visibility": "internal"
+      "visibility": "internal",
+      "related": [
+        "ci-print-crash"
+      ]
     },
     {
       "id": "appendix-checklist",
@@ -2669,7 +2733,8 @@ export const KB = {
         "setup-config-popup",
         "setup-printing-types",
         "marg-leftcut",
-        "marg-api"
+        "marg-api",
+        "print-triage"
       ]
     },
     {
@@ -2708,7 +2773,9 @@ export const KB = {
         "setup-printing-types",
         "setup-universal",
         "tally-select-printer",
-        "tally-invoice-title"
+        "tally-invoice-title",
+        "ci-webpos-parsing",
+        "print-triage"
       ],
       "images": [
         {
@@ -2826,7 +2893,10 @@ export const KB = {
         "ci-rdp",
         "marg-leftcut",
         "ci-rightcut",
-        "ci-longbill-split"
+        "ci-longbill-split",
+        "ci-webpos-parsing",
+        "ci-print-crash",
+        "print-triage"
       ]
     },
     {
@@ -2866,7 +2936,207 @@ export const KB = {
       "related": [
         "ci-printer-driver",
         "ci-rightcut",
-        "ci-print-cutoff"
+        "ci-print-cutoff",
+        "print-triage"
+      ]
+    },
+    {
+      "id": "ci-blackbar-preview",
+      "category": "Common Issue",
+      "system": "Printing",
+      "type": "reference",
+      "symptom": "Black bar / black cross over the total row in the local XPS capture or digital-bill preview - but the customer's actual bill is clean",
+      "cause": "The POS template's dark or blended total-row background renders as a solid black fill when Firefox prints it to the virtual printer. It affects ONLY the local capture/preview. BillFree rebuilds the customer's digital bill from parsed text, so the delivered WhatsApp bill is clean.",
+      "solution": [
+        "Check the customer's ACTUAL delivered WhatsApp bill. If it is clean (it almost always is) there is NO customer-facing problem - stop here and do not chase the preview.",
+        "Do NOT try to fix it with BillFree PDF Mode = MS or Transparent Background = Yes - those make it WORSE (a black cross across the whole bill). Keep PDF Mode = Auto and Transparent Background = No.",
+        "Unchecking 'Print backgrounds' in the browser or changing the XPS driver do not remove it either - it is baked into how the template renders.",
+        "If a clean local preview is genuinely wanted (cosmetic only), the POS vendor can add a print-CSS override on the total row: white background, black text, a top border instead of a dark fill."
+      ],
+      "tags": [
+        "black bar",
+        "black line",
+        "black cross",
+        "total row",
+        "preview",
+        "xps viewer",
+        "digital bill",
+        "pdf mode",
+        "transparent background",
+        "cosmetic",
+        "softwave",
+        "web pos"
+      ],
+      "level": "L1",
+      "last_verified": "2026-08",
+      "visibility": "public",
+      "related": [
+        "ci-webpos-parsing",
+        "setup-printing-types",
+        "print-triage"
+      ]
+    },
+    {
+      "id": "ci-webpos-parsing",
+      "category": "POS Integration",
+      "system": "Web POS",
+      "type": "setup",
+      "symptom": "Web / browser-based POS (softwave, shopwave, any dashboard POS): BillFree cannot parse the bill in Chrome - no readable XPS, mobile number not auto-picking",
+      "cause": "Chromium browsers (Chrome, Edge, Brave, Opera) rasterize the print job sent to a virtual printer, so the XPS contains no text runs for BillFree to parse. Firefox (Gecko) prints text-natively and produces parseable XPS. These are the only two browser engines on Windows - there is no third option to try.",
+      "solution": [
+        "Run the web POS in Firefox (Gecko). Chrome, Edge, Brave and Opera all share the Chromium engine and rasterize -> non-parseable. Firefox is the only engine that emits parseable text XPS.",
+        "For a fleet of merchants, standardise on Firefox ESR (slow release channel) so a browser update cannot silently change print output and break parsing everywhere at once.",
+        "Print one bill in Firefox to the BillFree printer, capture the sample XPS, and map the parsing rules (Mobile, Amount, Date, Customer Name) in the merchant config. The mobile number should now auto-pick.",
+        "If the output still has no selectable text even in Firefox, the POS itself is emitting an image. The POS developers must print text, not a bitmap, with the mobile number on a consistent labeled line (e.g. 'Mobile: 9805376500'). Hand them the developer spec: https://claude.ai/code/artifact/a7c20b88-3aa2-4647-b8d6-eedbf1b17783",
+        "Do NOT use Tor or privacy-hardened forks (LibreWolf, Mullvad) for a POS - they are Firefox-based (no benefit) and their hardening / slow network breaks web apps.",
+        "A black bar or A4 whitespace in the LOCAL capture preview is normal and preview-only - see ci-blackbar-preview. The customer bill is clean."
+      ],
+      "tags": [
+        "web pos",
+        "browser pos",
+        "web based",
+        "softwave",
+        "shopwave",
+        "chrome",
+        "firefox",
+        "gecko",
+        "chromium",
+        "edge",
+        "xps not generating",
+        "not parsing",
+        "no readable file",
+        "mobile not picking",
+        "parsing rules",
+        "browser",
+        "developer spec"
+      ],
+      "level": "L1",
+      "last_verified": "2026-08",
+      "visibility": "public",
+      "related": [
+        "setup-printing-types",
+        "ci-printer-driver",
+        "ci-blackbar-preview",
+        "tally-bitmap-mode",
+        "print-triage"
+      ]
+    },
+    {
+      "id": "ci-print-crash",
+      "category": "Common Issue",
+      "system": "Printer",
+      "type": "error",
+      "symptom": "Printing to the BillFree printer crashes / closes the application (Tally - and even Notepad) while the normal printer works fine",
+      "cause": "If ANY app crashes when printing to the BillFree printer but the physical printer works, the driver is not the cause - the common component is BillFree's print processor / port monitor throwing an exception inside the print callback. Event Viewer shows Application Error, exception 0xc000041d (STATUS_FATAL_USER_CALLBACK_EXCEPTION) in KERNELBASE.dll - KERNELBASE is only where it surfaces, not the culprit. Typical on Windows 7 x64 after driver experiments leave a corrupt install.",
+      "solution": [
+        "Confirm scope: print from Notepad to the BillFree printer. If Notepad crashes too, it is the BillFree printer/component, not the POS. STOP swapping drivers - every driver will crash the same way.",
+        "Pinpoint (2 min): Event Viewer > Windows Logs > Application > Filter Current Log > Error only > reproduce the crash > open the top Error > read 'Faulting application name' and 'Faulting module name'. 0xc000041d + KERNELBASE.dll = an exception inside the print callback (the BillFree print component).",
+        "Clear the spooler (CMD as Admin): net stop spooler / delete everything in %systemroot%\\System32\\spool\\PRINTERS\\ / net start spooler. Reboot and retest.",
+        "Remove the mess: delete the BillFree printer, then Print Server Properties > Drivers > 'Remove driver and package' for EVERY experimental driver (OpenXPS, DesignJet, DeskJet...). Restart the spooler.",
+        "Clean-reinstall the BillFree Universal utility as Administrator, then run InstallPrinter from C:\\BillFree\\Support\\ as Admin so it installs the correct driver. Confirm .NET Framework 4.5+ is present AND healthy (if 4.5.1 is already installed, run the Microsoft .NET Framework Repair Tool). Confirm C:\\BillFree\\Data exists and is writable.",
+        "Windows 7: do not hand-pick V4 class drivers (Microsoft OpenXPS / MS-XPS Class Driver 2 are Windows 8+) - let InstallPrinter choose. If a FRESH install still crashes, escalate to BillFree L2 with the two Event Viewer lines - or move the merchant to Windows 10/11 (Windows 7 is end-of-life and its print/XPS stack no longer fits modern BillFree components)."
+      ],
+      "tags": [
+        "crash",
+        "application closes",
+        "tally crashes",
+        "notepad crashes",
+        "0xc000041d",
+        "kernelbase",
+        "print crash",
+        "closes on print",
+        "windows 7",
+        "spooler",
+        "driver",
+        "event viewer",
+        "reinstall",
+        "faulting module"
+      ],
+      "level": "L2",
+      "last_verified": "2026-08",
+      "visibility": "public",
+      "related": [
+        "ci-printer-install",
+        "ci-printer-driver",
+        "ci-net7",
+        "setup-universal",
+        "appendix-escalation",
+        "print-triage"
+      ]
+    },
+    {
+      "id": "print-triage",
+      "category": "Common Issue",
+      "system": "Printing",
+      "type": "reference",
+      "symptom": "Print looks wrong? START HERE - printing triage: cut left / cut right / cut bottom / splits in two / wrong size / wrong printer / nothing prints / app crashes on print",
+      "cause": "Printing problems fall into a few distinct buckets with different fixes. This router sends you to the right record fast. The one check that applies to ALL of them: compare the DIGITAL bill with the PAPER. If the digital bill is fine and only the physical print is wrong, the cause is the printer paper size/form or the report layout - NOT BillFree.",
+      "solution": [
+        "FIRST CHECK (every case): digital bill fine + paper wrong => printer paper form / report margin problem (fix on the printer or the report, leave BillFree alone). Digital bill ALSO wrong => a capture/parsing problem => setup-printing-types, tally-bitmap-mode, ci-webpos-parsing.",
+        "Cut on the LEFT edge => marg-leftcut (report Page Setup left margin ~0.02 in).",
+        "Cut on the RIGHT edge => ci-rightcut (AutoPrintMode = NO, then a custom paper size / form).",
+        "Cut at the BOTTOM / last lines missing => ci-print-cutoff.",
+        "Long bill SPLITS into two parts => ci-longbill-split (increase the form length).",
+        "Prints on A4 instead of 3-inch / wrong page size => ci-pagesize-a4a5, busy-3inch, marg-a4instead3. A5 problems => ci-pagesize-a5, ci-a5-portrait. Two pages => busy-twopage.",
+        "Text too small / scaling wrong (especially over Remote Desktop) => ci-scaling, ci-rdp.",
+        "Nothing prints from an MFP / inkjet => ci-mfp-noprint. Error 0x709 => ci-0x709. Printer will not install => ci-printer-install. Properties error => ci-printer-props.",
+        "The POS is printing to the wrong printer => the per-POS select-printer records: busy-select-printer, tally-select-printer, gofrugal-select-printer, zorder-select, shopper-select, logics-select, drishti-select, monark-select, acme-printer, arnon-printer, eshopaid-windows.",
+        "Which XPS driver / how to make a 3-inch custom size => ci-printer-driver. QR or image blank ONLY via Forward Print => ci-qr-forward-blank. Black bar only in the preview => ci-blackbar-preview. App crashes when printing to BillFree => ci-print-crash."
+      ],
+      "tags": [
+        "print triage",
+        "start here",
+        "printing problem",
+        "print wrong",
+        "print issue",
+        "cut",
+        "cutting",
+        "which record",
+        "router",
+        "paper",
+        "thermal",
+        "3inch",
+        "printer problem",
+        "print not proper"
+      ],
+      "level": "L1",
+      "last_verified": "2026-08",
+      "visibility": "public",
+      "related": [
+        "marg-leftcut",
+        "ci-rightcut",
+        "ci-print-cutoff",
+        "ci-longbill-split",
+        "ci-pagesize-a4a5",
+        "busy-3inch",
+        "marg-a4instead3",
+        "ci-pagesize-a5",
+        "ci-a5-portrait",
+        "ci-scaling",
+        "ci-rdp",
+        "ci-mfp-noprint",
+        "ci-0x709",
+        "ci-printer-install",
+        "ci-printer-props",
+        "ci-printer-driver",
+        "ci-qr-forward-blank",
+        "ci-print-crash",
+        "setup-printing-types",
+        "tally-bitmap-mode",
+        "ci-webpos-parsing",
+        "ci-blackbar-preview",
+        "busy-select-printer",
+        "tally-select-printer",
+        "gofrugal-select-printer",
+        "zorder-select",
+        "shopper-select",
+        "logics-select",
+        "drishti-select",
+        "monark-select",
+        "acme-printer",
+        "arnon-printer",
+        "eshopaid-windows",
+        "busy-twopage"
       ]
     }
   ],

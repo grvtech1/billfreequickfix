@@ -201,6 +201,30 @@
       "expect": [
         "ci-longbill-split"
       ]
+    },
+    {
+      "q": "print looks wrong where do I start printing problem",
+      "expect": [
+        "print-triage"
+      ]
+    },
+    {
+      "q": "web based pos chrome not generating xps mobile not picking which browser",
+      "expect": [
+        "ci-webpos-parsing"
+      ]
+    },
+    {
+      "q": "black bar over total row in digital bill preview but customer bill is fine",
+      "expect": [
+        "ci-blackbar-preview"
+      ]
+    },
+    {
+      "q": "tally crashes when printing to billfree printer notepad also crashes 0xc000041d",
+      "expect": [
+        "ci-print-crash"
+      ]
     }
   ]
 }

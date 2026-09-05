@@ -7,7 +7,7 @@
 // Generated (do not edit):
 //   api/_kbdata.js    full KB bundled server-side (never a public static asset)
 //   public/index.html EMBEDDED_KB = PUBLIC records only (offline fallback)
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -66,4 +66,9 @@ console.log('regenerated EMBEDDED_KB (public-only) in public/index.html');
 const leak = publicRecs.filter((r) => internalIds.includes(r.id)).map((r) => r.id);
 if (leak.length) { console.error('ERROR: internal record in public embed: ' + leak.join(', ')); process.exit(1); }
 console.log('internal (gated):', internalIds.join(', '));
+// 4) keep the external master copy (../files3) in sync — local dev only; skipped on Vercel
+try {
+  const ext = join(ROOT, '..', 'files3', 'billfree-kb.json');
+  if (existsSync(join(ROOT, '..', 'files3'))) { copyFileSync(p('kb', 'billfree-kb.json'), ext); console.log('synced ../files3/billfree-kb.json'); }
+} catch (e) { console.log('files3 sync skipped:', e.message); }
 console.log('OK — KB artifacts generated.');

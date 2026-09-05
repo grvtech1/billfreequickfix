@@ -7,6 +7,8 @@
     "build:kb": "node scripts/build-kb.mjs",
     "test": "node scripts/smoke-test.mjs",
     "build": "node scripts/build-kb.mjs && node scripts/smoke-test.mjs",
-    "eval": "node scripts/eval-kb.mjs"
+    "eval": "node scripts/eval-kb.mjs",
+    "eval:self": "node scripts/eval-kb.mjs --self",
+    "stale": "node scripts/stale-report.mjs"
   }
 }

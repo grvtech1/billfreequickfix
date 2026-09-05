@@ -38,7 +38,11 @@ const master = JSON.parse(readFileSync(join(ROOT, 'kb', 'billfree-kb.json'), 'ut
 const RECORDS = master.records;
 const byId = new Map(RECORDS.map((r) => [r.id, r]));
 const suite = JSON.parse(readFileSync(join(ROOT, 'evals', 'cases.json'), 'utf8'));
-const TOPN = suite.topN || 3;
+// --self: self-consistency mode — every record's own symptom must rank itself #1.
+// Zero authoring, 100% coverage; failures = badly-worded symptoms or near-duplicates.
+const SELF = args.includes('--self');
+if (SELF) suite.cases = RECORDS.map((r) => ({ q: r.symptom, expect: [r.id] }));
+const TOPN = SELF ? 1 : (suite.topN || 3);
 
 // ---- validate the suite itself (dead expected ids are a real regression) ----
 let deadRefs = 0;
