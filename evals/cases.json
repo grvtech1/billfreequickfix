@@ -225,6 +225,24 @@
       "expect": [
         "ci-print-crash"
       ]
+    },
+    {
+      "q": "customer using windows on macbook billfree printer driver not installing no lpt port",
+      "expect": [
+        "ci-mac-windows"
+      ]
+    },
+    {
+      "q": "cannot set billfree as default printer his own printer stays default parallels",
+      "expect": [
+        "ci-mac-windows"
+      ]
+    },
+    {
+      "q": "how to create custom local port for billfree printer",
+      "expect": [
+        "ci-mac-windows"
+      ]
     }
   ]
 }

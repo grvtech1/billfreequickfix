@@ -2,7 +2,7 @@
 // Bundled into /api/kb (server-side only); contains internal records.
 export const KB = {
   "version": "2.7",
-  "updated": "2026-06",
+  "updated": "2026-09",
   "audience": "L1 Technical Support",
   "records": [
     {
@@ -102,7 +102,8 @@ export const KB = {
         "ci-print-crash",
         "tally-billtransfer",
         "wizapp-phase1",
-        "ci-util-install"
+        "ci-util-install",
+        "ci-mac-windows"
       ]
     },
     {
@@ -2126,12 +2127,13 @@ export const KB = {
       "system": "Printer",
       "type": "error",
       "symptom": "BillFree printer installation fails",
-      "cause": "Spooler stopped, wrong bitness, server compatibility, or Protected Print Mode.",
+      "cause": "Spooler stopped, wrong bitness, server compatibility, or Protected Print Mode, or Windows on an Apple-silicon Mac (ARM).",
       "solution": [
         "Cause 1 (Print Spooler not running): services.msc > Print Spooler > right-click > Restart.",
         "Cause 2 (32/64-bit mismatch): verify OS bitness in System Properties; use the matching installer.",
         "Cause 3 (Windows Server compat): confirm the Server version (2012/2016) is supported by the driver.",
-        "Cause 4 (Protected Print Mode): gpedit.msc > 'Point and Print Restrictions' > disable or add exception."
+        "Cause 4 (Protected Print Mode): gpedit.msc > 'Point and Print Restrictions' > disable or add exception.",
+        "Cause 5 (Windows on a Mac - Parallels / VMware Fusion): Settings > System > About shows 'ARM-based processor' => x64 printer drivers cannot install. Add the printer manually on the Microsoft XPS Class Driver + Local Port LPT1: - see ci-mac-windows."
       ],
       "tags": [
         "printer",
@@ -2139,7 +2141,9 @@ export const KB = {
         "32-bit",
         "64-bit",
         "server",
-        "gpedit"
+        "gpedit",
+        "mac",
+        "arm"
       ],
       "level": "L1",
       "images": [],
@@ -2149,7 +2153,8 @@ export const KB = {
         "ci-printer-driver",
         "ci-print-crash",
         "print-triage",
-        "ci-util-install"
+        "ci-util-install",
+        "ci-mac-windows"
       ]
     },
     {
@@ -2393,7 +2398,8 @@ export const KB = {
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "print-triage"
+        "print-triage",
+        "ci-mac-windows"
       ]
     },
     {
@@ -2974,7 +2980,8 @@ export const KB = {
         "ci-longbill-split",
         "ci-webpos-parsing",
         "ci-print-crash",
-        "print-triage"
+        "print-triage",
+        "ci-mac-windows"
       ]
     },
     {
@@ -3015,7 +3022,8 @@ export const KB = {
         "ci-printer-driver",
         "ci-rightcut",
         "ci-print-cutoff",
-        "print-triage"
+        "print-triage",
+        "ci-mac-windows"
       ]
     },
     {
@@ -3157,7 +3165,7 @@ export const KB = {
         "Long bill SPLITS into two parts => ci-longbill-split (increase the form length).",
         "Prints on A4 instead of 3-inch / wrong page size => ci-pagesize-a4a5, busy-3inch, marg-a4instead3. A5 problems => ci-pagesize-a5, ci-a5-portrait. Two pages => busy-twopage.",
         "Text too small / scaling wrong (especially over Remote Desktop) => ci-scaling, ci-rdp.",
-        "Nothing prints from an MFP / inkjet => ci-mfp-noprint. Error 0x709 => ci-0x709. Printer will not install => ci-printer-install. Properties error => ci-printer-props.",
+        "Nothing prints from an MFP / inkjet => ci-mfp-noprint. Error 0x709 => ci-0x709. Printer will not install => ci-printer-install. Windows on a Mac (Parallels / Fusion: driver fails, no LPT port, default printer keeps resetting) => ci-mac-windows. Properties error => ci-printer-props.",
         "The POS is printing to the wrong printer => the per-POS select-printer records: busy-select-printer, tally-select-printer, gofrugal-select-printer, zorder-select, shopper-select, logics-select, drishti-select, monark-select, acme-printer, arnon-printer, eshopaid-windows.",
         "Which XPS driver / how to make a 3-inch custom size => ci-printer-driver. QR or image blank ONLY via Forward Print => ci-qr-forward-blank. Black bar only in the preview => ci-blackbar-preview. App crashes when printing to BillFree => ci-print-crash."
       ],
@@ -3175,7 +3183,9 @@ export const KB = {
         "thermal",
         "3inch",
         "printer problem",
-        "print not proper"
+        "print not proper",
+        "mac",
+        "parallels"
       ],
       "level": "L1",
       "last_verified": "2026-08",
@@ -3214,7 +3224,80 @@ export const KB = {
         "acme-printer",
         "arnon-printer",
         "eshopaid-windows",
-        "busy-twopage"
+        "busy-twopage",
+        "ci-mac-windows"
+      ]
+    },
+    {
+      "id": "ci-mac-windows",
+      "category": "Common Issue",
+      "system": "Printer",
+      "type": "howto",
+      "symptom": "Windows running on a Mac / MacBook (Parallels, VMware Fusion): BillFree HP printer driver will not install, no LPT1 port in the port list, and BillFree cannot be set as the default printer (the customer's own printer stays default)",
+      "cause": "On an Apple-silicon Mac (M1-M4) Windows 11 is the ARM64 edition, which cannot load x64 printer drivers - so InstallPrinter (which installs the bundled HP driver from its x64/x86 folder and binds it to LPT1:) fails, and the VM may have no LPT1: port at all. Separately, Parallels 'Synchronize default printer' and Windows 'Let Windows manage my default printer' keep switching the default back to the Mac / customer printer, so bills silently bypass BillFree. Field fix: add the BillFree printer manually on the Microsoft XPS Class Driver (in-box, installs on ARM) bound to a Local Port LPT1:.",
+      "solution": [
+        "IDENTIFY THE MAC: in Windows open Settings > System > About > System type. 'ARM-based processor' = Apple-silicon Mac -> x64 drivers cannot install (this is why the HP BillFree driver fails) -> follow the steps below. 'x64-based processor' = Intel Mac -> installs like a normal PC: run InstallPrinter from C:\\BillFree\\Support as Administrator (setup-universal).",
+        "FIX PARALLELS FIRST: Parallels > Actions > Configure > Hardware > Print > UNTICK 'Synchronize default printer' (if greyed out, shut Windows down - not suspend - then change it). If Hardware lists a 'Printer' (LPT) device, remove it so it cannot grab LPT1:. VMware Fusion: Virtual Machine > Settings > Printer > turn printer sharing off.",
+        "ADD THE PRINTER MANUALLY: Settings > Bluetooth & devices > Printers & scanners > Add device > 'Add manually' > 'Add a local printer or network printer with manual settings' > Next.",
+        "CHOOSE THE PORT: 'Use an existing port' = LPT1: (the same port BillFree's own script uses). If LPT1: is NOT in the list: select 'Create a new port' > Type of port = 'Local Port' > Next > enter the port name  LPT1:  > OK. (Admin PowerShell alternative: Add-PrinterPort -Name \"LPT1:\"). Do NOT use FILE: or PORTPROMPT: (they ask for a file name on every print), and do not use USB / TCP-IP / Mac-shared printer ports.",
+        "CHOOSE THE DRIVER: Manufacturer 'Microsoft' > 'Microsoft XPS Class Driver' (built into Windows, installs on ARM - this is what worked in the field when the HP BillFree driver would not). Name the printer exactly  BillFree  and do not share it.",
+        "Already added on another port? Printer properties > Ports tab > tick LPT1: > Apply (or Admin PowerShell: Set-Printer -Name \"BillFree\" -PortName \"LPT1:\"). Restart the Print Spooler afterwards.",
+        "SET BILLFREE AS DEFAULT: Settings > Printers & scanners > turn OFF 'Let Windows manage my default printer' > BillFree > Set as default (or Admin CMD: rundll32 printui.dll,PrintUIEntry /y /n \"BillFree\", or run C:\\BillFree\\Support\\SetBillFreeDefaultPrinter.bat). If it still reverts: regedit > HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows > DWORD LegacyDefaultPrinterMode = 1. Error 0x00000709 => ci-0x709. Workaround: select BillFree inside the POS's own printer setting - then the Windows default does not matter.",
+        "PHYSICAL (THERMAL) PRINTER: plug it into the Mac, then Parallels > Devices > USB & Bluetooth > connect it to WINDOWS and install its Windows driver. Use that printer as Fwd Target Printer. Avoid the Mac-shared copy of the printer - it prints through a generic driver and often gets the 3-inch width wrong.",
+        "BILLFREE CONFIGURATION: Target Printer = BillFree, Forward Print Job = Yes, Fwd Target Printer = the thermal printer connected in the previous step. Save.",
+        "LIMIT: the Microsoft XPS Class Driver supports Letter/A4 only, so bills longer than ~11 inches get cut (digital and print) - see ci-longbill-split / ci-printer-driver. For long bills on an ARM Mac, check Add a printer > driver screen > 'Windows Update' for HP DesignJet T2600 / T530 V4: only drivers that appear there can install on ARM.",
+        "VERIFY: print from Notepad to BillFree -> a PDF + JSON appears in C:\\BillFree\\Data -> the digital bill arrives -> the paper copy prints. Then restart Windows and confirm BillFree is STILL the default printer (proves the Parallels sync is off).",
+        "ESCALATE: if the printer installs but NOTHING lands in C:\\BillFree\\Data after a test print, stop troubleshooting the Mac - escalate to L2 as 'Universal on Windows 11 ARM (Mac M-series)' with the System type, Windows version, Parallels/Fusion version and BillFree utility version."
+      ],
+      "tags": [
+        "mac",
+        "macbook",
+        "imac",
+        "apple",
+        "windows on mac",
+        "parallels",
+        "vmware fusion",
+        "virtual machine",
+        "vm",
+        "apple silicon",
+        "m1",
+        "m2",
+        "m3",
+        "m4",
+        "arm",
+        "arm64",
+        "arm-based processor",
+        "driver not installing",
+        "hp driver fails",
+        "installprinter fails",
+        "no lpt port",
+        "lpt1",
+        "lpt",
+        "create port",
+        "custom port",
+        "local port",
+        "new port",
+        "which port",
+        "microsoft xps class driver",
+        "xps printer",
+        "default printer",
+        "cannot set default printer",
+        "default printer not changing",
+        "default printer resets",
+        "synchronize default printer",
+        "let windows manage my default printer"
+      ],
+      "level": "L1",
+      "images": [],
+      "last_verified": "2026-09",
+      "visibility": "public",
+      "related": [
+        "setup-universal",
+        "ci-printer-install",
+        "ci-printer-driver",
+        "ci-0x709",
+        "ci-longbill-split",
+        "print-triage"
       ]
     }
   ],
