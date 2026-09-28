@@ -2155,7 +2155,8 @@ export const KB = {
         "ci-print-crash",
         "print-triage",
         "ci-util-install",
-        "ci-mac-windows"
+        "ci-mac-windows",
+        "ci-rdp"
       ]
     },
     {
@@ -2660,37 +2661,69 @@ export const KB = {
       "category": "Common Issue",
       "system": "RDP",
       "type": "error",
-      "level": "L2",
-      "symptom": "Printer redirection / config issues (invalid or 0 KB files) in Client-Server (RDP) setup",
-      "cause": "Printers not redirected from client to remote session.",
+      "level": "L1",
+      "symptom": "Remote Desktop (RDP / client-server) setup: BillFree printer does not redirect into the RDP session, the HP BillFree printer will not install, or the BillFree logs show 'invalid file' / a 0 KB file even though the printer is redirected",
+      "cause": "In an RDP setup the POS runs on the SERVER, while the BillFree utility + BillFree printer are on the CLIENT PC - so every bill has to travel back to the client through printer redirection. Three field failures: (1) the bundled HP-driver BillFree printer will not install on the client, (2) it installs but does not redirect into the RDP session, (3) it redirects but the job arrives broken - the BillFree log shows 'invalid file' and a 0 KB file, so no digital bill is created. Field practice: for A4 / A5 bills the Microsoft XPS Class Driver redirects in real time; TSPrint (server + client) fixes redirection failures AND the invalid / 0 KB file problem - the file then arrives correctly.",
       "solution": [
-        "Install TSPrint server on the server side: https://www.terminalworks.com/downloads/tsprint/3.2.3.13/TSPrint_server.exe",
-        "Install TSPrint client on the client side: https://www.terminalworks.com/downloads/tsprint/TSPrint_client.exe",
-        "Redirection sends printers from the client's local workstation into the remote session."
+        "CONFIRM THE SETUP: the POS opens through Remote Desktop (mstsc / a server), and BillFree is installed on the client PC where the customer sits. Inside the RDP session open Printers & scanners: BillFree should appear as 'BillFree (redirected N)'. Missing = redirection problem. Present, but no digital bill and the BillFree log shows 'invalid file' / 0 KB = broken file - go straight to TSPrint.",
+        "BASIC RDP CHECK: Remote Desktop Connection > Show Options > Local Resources > 'Printers' must be ticked. Log off (do not just close) the session and reconnect after any printer change - redirected printers are only rebuilt at login.",
+        "A4 / A5 BILLS - QUICK FIX (field-proven): when the HP BillFree printer will not install or will not redirect, install the BillFree printer on the CLIENT with the Microsoft XPS Class Driver instead: Add a printer > 'The printer that I want isn't listed' > Add a local printer > keep BillFree's port > Manufacturer 'Microsoft' > 'Microsoft XPS Class Driver' > name it exactly  BillFree . It redirects into the RDP session in real time - nothing to install on the server.",
+        "LIMIT of the quick fix: the Microsoft XPS Class Driver supports standard pages only (A4 / A5 / Letter). For 3-inch thermal or long bills, use TSPrint (below) - see also ci-printer-driver.",
+        "TSPRINT - use it when the printer still will not redirect, when the bill is 3-inch / long, or when the logs show 'invalid file' / 0 KB. SERVER: install TSPrint server as Administrator: https://www.terminalworks.com/downloads/tsprint/3.2.3.13/TSPrint_server.exe",
+        "TSPRINT CLIENT: install on EVERY client PC that runs BillFree, as Administrator: https://www.terminalworks.com/downloads/tsprint/TSPrint_client.exe  Then log off the RDP session completely and log in again.",
+        "TSPRINT CLIENT OPTIONS > Redirection tab: tick BillFree (plus the physical printer if the server must print to it) and keep 'Always map default printer' ticked. General tab: Default printer = BillFree; keep 'Map settings' ticked; keep 'Print as image' UNTICKED - an image job has no text, so BillFree cannot read the mobile / amount (same problem as tally-bitmap-mode); leave 'Fit to page' unticked so the layout is not rescaled. Tick 'Enable logging' only while troubleshooting. Apply - the additional options take effect at the next login.",
+        "POINT THE POS AT BILLFREE: make BillFree the DEFAULT printer on the CLIENT - RDP (and TSPrint 'Always map default printer') carries it into the session as the default, and the POS follows it. Do not select 'BillFree (redirected N)' by name inside the POS: the session number can change at every login and the POS then loses the printer. If BillFree will not stay default, see ci-default-printer.",
+        "VERIFY: make one real bill in the POS on the server -> the BillFree log on the client shows a valid file (NOT 'invalid file', NOT 0 KB) -> a PDF + JSON lands in C:\\BillFree\\Data on the client -> the digital bill arrives -> the paper copy prints.",
+        "ESCALATE to L2 if TSPrint is installed on both ends, BillFree is ticked in TSPrint Redirection, and files are still 0 KB / invalid: send the BillFree log lines, TSPrint server + client versions, the server OS, and the RDP client's Windows version."
       ],
       "tags": [
         "rdp",
-        "tsprint",
-        "redirection",
+        "remote desktop",
+        "mstsc",
         "client-server",
-        "0kb"
+        "client server",
+        "server",
+        "terminal server",
+        "redirection",
+        "printer redirection",
+        "redirected printer",
+        "printer not redirected",
+        "not redirecting",
+        "tsprint",
+        "tsprint server",
+        "tsprint client",
+        "0kb",
+        "0 kb",
+        "zero kb",
+        "empty file",
+        "invalid file",
+        "invalid file in logs",
+        "hp printer not installing",
+        "microsoft xps class driver",
+        "xps printer",
+        "a4",
+        "a5",
+        "print as image",
+        "always map default printer"
       ],
       "images": [
         {
           "src": "kb-images/ci-rdp-1.jpg",
-          "caption": ""
+          "caption": "TSPrint Client Options > General: Default printer = BillFree, keep 'Map settings' ticked, leave 'Print as image' and 'Fit to page' unticked."
         },
         {
           "src": "kb-images/ci-rdp-2.jpg",
-          "caption": ""
+          "caption": "TSPrint Client Options > Redirection: tick the BillFree printer (and the physical printer if needed); keep 'Always map default printer' ticked."
         }
       ],
-      "last_verified": "2026-05",
+      "last_verified": "2026-09",
       "visibility": "public",
       "related": [
         "ci-printer-driver",
         "print-triage",
-        "ci-default-printer"
+        "ci-default-printer",
+        "ci-printer-install",
+        "tally-bitmap-mode"
       ]
     },
     {
@@ -2868,7 +2901,8 @@ export const KB = {
         "tally-select-printer",
         "tally-invoice-title",
         "ci-webpos-parsing",
-        "print-triage"
+        "print-triage",
+        "ci-rdp"
       ],
       "images": [
         {
@@ -3173,7 +3207,7 @@ export const KB = {
         "Cut at the BOTTOM / last lines missing => ci-print-cutoff.",
         "Long bill SPLITS into two parts => ci-longbill-split (increase the form length).",
         "Prints on A4 instead of 3-inch / wrong page size => ci-pagesize-a4a5, busy-3inch, marg-a4instead3. A5 problems => ci-pagesize-a5, ci-a5-portrait. Two pages => busy-twopage.",
-        "Text too small / scaling wrong (especially over Remote Desktop) => ci-scaling, ci-rdp.",
+        "Text too small / scaling wrong => ci-scaling. Remote Desktop: BillFree printer not redirecting, HP BillFree printer will not install, or 'invalid file' / 0 KB in the logs => ci-rdp (Microsoft XPS Class Driver for A4/A5, TSPrint server + client).",
         "Nothing prints from an MFP / inkjet => ci-mfp-noprint. Error 0x709 => ci-0x709. Printer will not install => ci-printer-install. Windows on a Mac (Parallels / Fusion: driver fails, no LPT port) => ci-mac-windows. BillFree will not stay the default printer (bills bypass BillFree) => ci-default-printer. Properties error => ci-printer-props.",
         "The POS is printing to the wrong printer => the per-POS select-printer records: busy-select-printer, tally-select-printer, gofrugal-select-printer, zorder-select, shopper-select, logics-select, drishti-select, monark-select, acme-printer, arnon-printer, eshopaid-windows.",
         "Which XPS driver / how to make a 3-inch custom size => ci-printer-driver. QR or image blank ONLY via Forward Print => ci-qr-forward-blank. Black bar only in the preview => ci-blackbar-preview. App crashes when printing to BillFree => ci-print-crash."
@@ -3195,7 +3229,9 @@ export const KB = {
         "print not proper",
         "mac",
         "parallels",
-        "default printer"
+        "default printer",
+        "rdp",
+        "0 kb"
       ],
       "level": "L1",
       "last_verified": "2026-08",
@@ -3335,7 +3371,7 @@ export const KB = {
         "DIAGNOSE FIRST (30 sec) - is it a WRITE failure or a RESET? Get the exact printer name with  Get-Printer | Select-Object Name  (e.g. it may be 'BillFree (Copy 1)'). Then in PowerShell run:  rundll32 printui.dll,PrintUIEntry /y /n \"BillFree\"  and immediately  (Get-CimInstance Win32_Printer | Where-Object Default).Name . Old printer shown straight away (or error 0x709) = Windows cannot WRITE it -> go to the WRITE FIX step. BillFree shown, but it changes back later or after a restart = something RESETS it -> do the next three steps.",
         "STOP WINDOWS MANAGING IT: Settings > Bluetooth & devices > Printers & scanners > turn OFF 'Let Windows manage my default printer'. Lock it so it cannot turn back on: regedit > HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows > DWORD  LegacyDefaultPrinterMode = 1 . On Windows Pro you can instead use gpedit.msc > Administrative Templates > Control Panel > Printers > 'Turn off Windows default printer management' = Enabled.",
         "WINDOWS ON A MAC (Parallels): shut Windows DOWN fully (not suspend) > Parallels > Configure > Hardware > Print > UNTICK 'Synchronize default printer' AND UNTICK 'Share Mac printers with Windows'. With sharing off, the Mac's printers disappear from Windows, so there is nothing left for Parallels to force back as default. Connect the thermal printer to Windows over USB instead (Parallels > Devices > USB & Bluetooth) and use it as Fwd Target Printer - see ci-mac-windows. VMware Fusion: Virtual Machine > Settings > Printer > turn sharing off.",
-        "REMOTE DESKTOP: the session makes the CLIENT's default printer the default at every login. Server fix: gpedit.msc > Computer Configuration > Administrative Templates > Windows Components > Remote Desktop Services > Remote Desktop Session Host > Printer Redirection > 'Do not set default client printer to be default printer in a session' = Enabled. Or on the client: Remote Desktop Connection > Show Options > Local Resources > untick Printers (see ci-rdp).",
+        "REMOTE DESKTOP: the session makes the CLIENT's default printer the default at every login. Usual BillFree setup (BillFree on the CLIENT, POS on the server): make BillFree the default on the CLIENT - RDP then carries it into the session as the default (see ci-rdp; with TSPrint keep 'Always map default printer' ticked). Only if BillFree is installed on the SERVER itself does the client's default override it - then on the server: gpedit.msc > Computer Configuration > Administrative Templates > Windows Components > Remote Desktop Services > Remote Desktop Session Host > Printer Redirection > 'Do not set default client printer to be default printer in a session' = Enabled.",
         "WRITE FIX (old printer stays at once / 0x709): give the user Full Control on HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows (ci-0x709). If the button still fails, write it directly: in regedit open ...\\CurrentVersion\\Devices and note BillFree's value (e.g. winspool,Ne01:), then in ...\\CurrentVersion\\Windows set the string value  Device = BillFree,winspool,Ne01:  (use exactly the value you noted), sign out and back in.",
         "DUMMY TCP/IP PORT: if the BillFree printer sits on a Standard TCP/IP port with a dummy IP (e.g. 10.0.0.1 - used on Macs with no LPT port), open printer properties > Ports > Configure Port > UNTICK 'SNMP Status Enabled'. Windows then stops polling the fake IP, and BillFree keeps showing Ready instead of Offline.",
         "SET IT AND PROVE IT: Settings > Printers & scanners > BillFree > Set as default (or the rundll32 line above, or C:\\BillFree\\Support\\SetBillFreeDefaultPrinter.bat). Restart Windows, wait 1 minute, re-run  (Get-CimInstance Win32_Printer | Where-Object Default).Name  - it must still say BillFree.",

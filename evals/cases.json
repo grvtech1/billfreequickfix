@@ -256,6 +256,24 @@
       "expect": [
         "ci-mac-windows"
       ]
+    },
+    {
+      "q": "rdp setup billfree printer not redirected into remote desktop session",
+      "expect": [
+        "ci-rdp"
+      ]
+    },
+    {
+      "q": "logs show invalid file 0 kb file client server remote desktop",
+      "expect": [
+        "ci-rdp"
+      ]
+    },
+    {
+      "q": "hp billfree printer not installing on rdp client a4 bill install microsoft xps printer",
+      "expect": [
+        "ci-rdp"
+      ]
     }
   ]
 }
