@@ -101,7 +101,8 @@
         "tally-billtransfer",
         "wizapp-phase1",
         "ci-util-install",
-        "ci-mac-windows"
+        "ci-mac-windows",
+        "ci-default-printer"
       ]
     },
     {
@@ -2389,7 +2390,11 @@
         "printer",
         "0x00000709",
         "registry",
-        "default printer"
+        "default printer",
+        "0x709",
+        "error 0x709",
+        "cannot set as default printer",
+        "set as default error"
       ],
       "level": "L1",
       "images": [],
@@ -2397,7 +2402,8 @@
       "visibility": "public",
       "related": [
         "print-triage",
-        "ci-mac-windows"
+        "ci-mac-windows",
+        "ci-default-printer"
       ]
     },
     {
@@ -2498,7 +2504,8 @@
       "last_verified": "2026-05",
       "visibility": "public",
       "related": [
-        "setup-printing-types"
+        "setup-printing-types",
+        "ci-default-printer"
       ]
     },
     {
@@ -2680,7 +2687,8 @@
       "visibility": "public",
       "related": [
         "ci-printer-driver",
-        "print-triage"
+        "print-triage",
+        "ci-default-printer"
       ]
     },
     {
@@ -3164,7 +3172,7 @@
         "Long bill SPLITS into two parts => ci-longbill-split (increase the form length).",
         "Prints on A4 instead of 3-inch / wrong page size => ci-pagesize-a4a5, busy-3inch, marg-a4instead3. A5 problems => ci-pagesize-a5, ci-a5-portrait. Two pages => busy-twopage.",
         "Text too small / scaling wrong (especially over Remote Desktop) => ci-scaling, ci-rdp.",
-        "Nothing prints from an MFP / inkjet => ci-mfp-noprint. Error 0x709 => ci-0x709. Printer will not install => ci-printer-install. Windows on a Mac (Parallels / Fusion: driver fails, no LPT port, default printer keeps resetting) => ci-mac-windows. Properties error => ci-printer-props.",
+        "Nothing prints from an MFP / inkjet => ci-mfp-noprint. Error 0x709 => ci-0x709. Printer will not install => ci-printer-install. Windows on a Mac (Parallels / Fusion: driver fails, no LPT port) => ci-mac-windows. BillFree will not stay the default printer (bills bypass BillFree) => ci-default-printer. Properties error => ci-printer-props.",
         "The POS is printing to the wrong printer => the per-POS select-printer records: busy-select-printer, tally-select-printer, gofrugal-select-printer, zorder-select, shopper-select, logics-select, drishti-select, monark-select, acme-printer, arnon-printer, eshopaid-windows.",
         "Which XPS driver / how to make a 3-inch custom size => ci-printer-driver. QR or image blank ONLY via Forward Print => ci-qr-forward-blank. Black bar only in the preview => ci-blackbar-preview. App crashes when printing to BillFree => ci-print-crash."
       ],
@@ -3184,7 +3192,8 @@
         "printer problem",
         "print not proper",
         "mac",
-        "parallels"
+        "parallels",
+        "default printer"
       ],
       "level": "L1",
       "last_verified": "2026-08",
@@ -3224,7 +3233,8 @@
         "arnon-printer",
         "eshopaid-windows",
         "busy-twopage",
-        "ci-mac-windows"
+        "ci-mac-windows",
+        "ci-default-printer"
       ]
     },
     {
@@ -3233,17 +3243,17 @@
       "system": "Printer",
       "type": "howto",
       "symptom": "Windows running on a Mac / MacBook (Parallels, VMware Fusion): BillFree HP printer driver will not install, no LPT1 port in the port list, and BillFree cannot be set as the default printer (the customer's own printer stays default)",
-      "cause": "On an Apple-silicon Mac (M1-M4) Windows 11 is the ARM64 edition, which cannot load x64 printer drivers - so InstallPrinter (which installs the bundled HP driver from its x64/x86 folder and binds it to LPT1:) fails, and the VM may have no LPT1: port at all. Separately, Parallels 'Synchronize default printer' and Windows 'Let Windows manage my default printer' keep switching the default back to the Mac / customer printer, so bills silently bypass BillFree. Field fix: add the BillFree printer manually on the Microsoft XPS Class Driver (in-box, installs on ARM) bound to a Local Port LPT1:.",
+      "cause": "On an Apple-silicon Mac (M1-M4) Windows 11 is the ARM64 edition, which cannot load x64 printer drivers - so InstallPrinter (which installs the bundled HP driver from its x64/x86 folder and binds it to LPT1:) fails, and the VM may have no LPT1: port at all. Separately, Parallels 'Synchronize default printer' and Windows 'Let Windows manage my default printer' keep switching the default back to the Mac / customer printer, so bills silently bypass BillFree. Field fix (Sep 2026, Windows 11 on a MacBook): the HP driver would not install and there was no LPT port, so the BillFree printer was added manually on the Microsoft XPS Class Driver (in-box, installs on ARM) bound to a Standard TCP/IP port with a dummy IP (10.0.0.1). The default printer still would not stick - see ci-default-printer.",
       "solution": [
         "IDENTIFY THE MAC: in Windows open Settings > System > About > System type. 'ARM-based processor' = Apple-silicon Mac -> x64 drivers cannot install (this is why the HP BillFree driver fails) -> follow the steps below. 'x64-based processor' = Intel Mac -> installs like a normal PC: run InstallPrinter from C:\\BillFree\\Support as Administrator (setup-universal).",
         "INSTALL THE UTILITY FIRST: install the BillFree Universal MSI as normal (setup-universal) - on ARM only the InstallPrinter script step fails. Skip that script and add the printer manually as below.",
         "CLEAN UP THE FAILED ATTEMPT: Settings > Printers & scanners > remove any half-installed 'BillFree' / 'BillFree (Copy 1)' printer left by the failed script. Otherwise the new printer gets a different name and no longer matches Target Printer = BillFree in BillFree Configuration.",
         "FIX PARALLELS FIRST: Parallels > Actions > Configure > Hardware > Print > UNTICK 'Synchronize default printer' (if greyed out, shut Windows down - not suspend - then change it). If Hardware lists a 'Printer' (LPT) device, remove it so it cannot grab LPT1:. VMware Fusion: Virtual Machine > Settings > Printer > turn printer sharing off.",
         "ADD THE PRINTER MANUALLY: Settings > Bluetooth & devices > Printers & scanners > Add device > 'Add manually' > 'Add a local printer or network printer with manual settings' > Next.",
-        "CHOOSE THE PORT: 'Use an existing port' = LPT1: (the same port BillFree's own script uses). To check what exists: Admin PowerShell  Get-PrinterPort | Select-Object Name. If LPT1: is NOT listed: select 'Create a new port' > Type of port = 'Local Port' > Next > enter the port name  LPT1:  > OK (or Admin PowerShell: Add-PrinterPort -Name \"LPT1:\"). Do NOT use FILE: or PORTPROMPT: (they ask for a file name on every print), NUL: (the job is discarded), or USB / TCP-IP / Mac-shared printer ports.",
+        "CHOOSE THE PORT: if LPT1: is in the list, use it (the same port BillFree's own script uses). Check with Admin PowerShell  Get-PrinterPort | Select-Object Name . NO LPT PORT (field case - worked): 'Create a new port' > 'Standard TCP/IP Port' > Next > Hostname or IP address = a dummy IP (field used 10.0.0.1) > untick 'Query the printer and automatically select the driver' > Next > if asked for additional port information choose Device Type = Standard 'Generic Network Card' > Next. BillFree captures the job at the print layer, so the port only has to exist. Pick an IP that is not a real device on that network (if the customer's router is 10.0.0.1, use an unused address). Alternative: 'Create a new port' > Local Port > name  LPT1: . Do NOT use FILE: or PORTPROMPT: (they ask for a file name on every print), NUL: (the job is discarded), or USB / Mac-shared printer ports.",
         "CHOOSE THE DRIVER: Manufacturer 'Microsoft' > 'Microsoft XPS Class Driver' (built into Windows, installs on ARM - this is what worked in the field when the HP BillFree driver would not). Name the printer exactly  BillFree  and do not share it.",
-        "Already added on another port? Printer properties > Ports tab > tick LPT1: > Apply. If LPT1: is missing there: Add Port... > Local Port > New Port... > type  LPT1:  > OK > Close > tick it > Apply (or Admin PowerShell: Set-Printer -Name \"BillFree\" -PortName \"LPT1:\"). Restart the Print Spooler afterwards.",
-        "SET BILLFREE AS DEFAULT: first confirm BillFree shows in Printers & scanners with no driver error (a printer whose driver failed cannot become the default). Then Settings > Printers & scanners > turn OFF 'Let Windows manage my default printer' > BillFree > Set as default (or Admin CMD: rundll32 printui.dll,PrintUIEntry /y /n \"BillFree\", or run C:\\BillFree\\Support\\SetBillFreeDefaultPrinter.bat). If it still reverts: regedit > HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows > DWORD LegacyDefaultPrinterMode = 1. Error 0x00000709 => ci-0x709. Workaround: select BillFree inside the POS's own printer setting - then the Windows default does not matter.",
+        "After adding (TCP/IP dummy port): printer properties > Ports > Configure Port > UNTICK 'SNMP Status Enabled' so Windows does not poll the fake IP and mark BillFree Offline. To move an existing printer to a port: Ports tab > tick the port > Apply (or Admin PowerShell: Set-Printer -Name \"BillFree\" -PortName \"<port name>\"). Restart the Print Spooler afterwards.",
+        "SET BILLFREE AS DEFAULT: first confirm BillFree shows in Printers & scanners with no driver error (a printer whose driver failed cannot become the default). Turn OFF 'Let Windows manage my default printer' > BillFree > Set as default. If the click does nothing or it keeps switching back to the customer's own printer (field case - the simple fix did not hold) => follow ci-default-printer: diagnose write vs reset, untick BOTH Parallels 'Synchronize default printer' and 'Share Mac printers with Windows', lock LegacyDefaultPrinterMode = 1, add the startup backstop - or simply select BillFree inside the POS's own printer setting.",
         "PHYSICAL (THERMAL) PRINTER: plug it into the Mac, then Parallels > Devices > USB & Bluetooth > connect it to WINDOWS and install its Windows driver. Use that printer as Fwd Target Printer. Avoid the Mac-shared copy of the printer - it prints through a generic driver and often gets the 3-inch width wrong.",
         "BILLFREE CONFIGURATION: Target Printer = BillFree, Forward Print Job = Yes, Fwd Target Printer = the thermal printer connected in the previous step. Save.",
         "LIMIT: the Microsoft XPS Class Driver supports Letter/A4 only, so bills longer than ~11 inches get cut (digital and print) - see ci-longbill-split / ci-printer-driver. For long bills on an ARM Mac, check Add a printer > driver screen > 'Windows Update' for HP DesignJet T2600 / T530 V4: only drivers that appear there can install on ARM.",
@@ -3289,7 +3299,13 @@
         "let windows manage my default printer",
         "copy 1",
         "remove printer",
-        "get-printerport"
+        "get-printerport",
+        "standard tcp/ip port",
+        "tcp ip port",
+        "dummy ip",
+        "10.0.0.1",
+        "snmp",
+        "generic network card"
       ],
       "level": "L1",
       "images": [],
@@ -3302,7 +3318,66 @@
         "ci-0x709",
         "ci-longbill-split",
         "print-triage",
-        "ci-rightcut"
+        "ci-rightcut",
+        "ci-default-printer"
+      ]
+    },
+    {
+      "id": "ci-default-printer",
+      "category": "Common Issue",
+      "system": "Printer",
+      "type": "error",
+      "symptom": "Cannot set BillFree as the default printer - clicking 'Set as default' does nothing, or the default keeps switching back to the customer's own printer (Windows 11, Windows on Mac / Parallels, Remote Desktop)",
+      "cause": "Two different failures look identical: (1) Windows CANNOT WRITE the default (permission on the user's registry 'Windows' key - often silent, sometimes error 0x709), or (2) something RESETS it right after you set it: Windows 11 'Let Windows manage my default printer' (makes the last-used printer default), Parallels 'Synchronize default printer' / Mac printer sharing (re-applies the Mac's default), or a Remote Desktop session (makes the client's printer the default at login). Why it matters: if BillFree is not the printer the POS prints to, bills go straight to the physical printer and NO digital bill is created - nothing looks broken. Field case (Sep 2026, Windows 11 on a MacBook): the plain 'Set as default' click did not hold.",
+      "solution": [
+        "DIAGNOSE FIRST (30 sec) - is it a WRITE failure or a RESET? Get the exact printer name with  Get-Printer | Select-Object Name  (e.g. it may be 'BillFree (Copy 1)'). Then in PowerShell run:  rundll32 printui.dll,PrintUIEntry /y /n \"BillFree\"  and immediately  (Get-CimInstance Win32_Printer | Where-Object Default).Name . Old printer shown straight away (or error 0x709) = Windows cannot WRITE it -> go to the WRITE FIX step. BillFree shown, but it changes back later or after a restart = something RESETS it -> do the next three steps.",
+        "STOP WINDOWS MANAGING IT: Settings > Bluetooth & devices > Printers & scanners > turn OFF 'Let Windows manage my default printer'. Lock it so it cannot turn back on: regedit > HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows > DWORD  LegacyDefaultPrinterMode = 1 . On Windows Pro you can instead use gpedit.msc > Administrative Templates > Control Panel > Printers > 'Turn off Windows default printer management' = Enabled.",
+        "WINDOWS ON A MAC (Parallels): shut Windows DOWN fully (not suspend) > Parallels > Configure > Hardware > Print > UNTICK 'Synchronize default printer' AND UNTICK 'Share Mac printers with Windows'. With sharing off, the Mac's printers disappear from Windows, so there is nothing left for Parallels to force back as default. Connect the thermal printer to Windows over USB instead (Parallels > Devices > USB & Bluetooth) and use it as Fwd Target Printer - see ci-mac-windows. VMware Fusion: Virtual Machine > Settings > Printer > turn sharing off.",
+        "REMOTE DESKTOP: the session makes the CLIENT's default printer the default at every login. Server fix: gpedit.msc > Computer Configuration > Administrative Templates > Windows Components > Remote Desktop Services > Remote Desktop Session Host > Printer Redirection > 'Do not set default client printer to be default printer in a session' = Enabled. Or on the client: Remote Desktop Connection > Show Options > Local Resources > untick Printers (see ci-rdp).",
+        "WRITE FIX (old printer stays at once / 0x709): give the user Full Control on HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows (ci-0x709). If the button still fails, write it directly: in regedit open ...\\CurrentVersion\\Devices and note BillFree's value (e.g. winspool,Ne01:), then in ...\\CurrentVersion\\Windows set the string value  Device = BillFree,winspool,Ne01:  (use exactly the value you noted), sign out and back in.",
+        "DUMMY TCP/IP PORT: if the BillFree printer sits on a Standard TCP/IP port with a dummy IP (e.g. 10.0.0.1 - used on Macs with no LPT port), open printer properties > Ports > Configure Port > UNTICK 'SNMP Status Enabled'. Windows then stops polling the fake IP, and BillFree keeps showing Ready instead of Offline.",
+        "SET IT AND PROVE IT: Settings > Printers & scanners > BillFree > Set as default (or the rundll32 line above, or C:\\BillFree\\Support\\SetBillFreeDefaultPrinter.bat). Restart Windows, wait 1 minute, re-run  (Get-CimInstance Win32_Printer | Where-Object Default).Name  - it must still say BillFree.",
+        "BACKSTOP if something still overrides it at startup: Win+R > shell:startup > create a file BillFreeDefault.bat with two lines:  timeout /t 45 /nobreak  and  rundll32 printui.dll,PrintUIEntry /y /n \"BillFree\" . It re-applies BillFree as default 45 seconds after every login - after Parallels / Remote Desktop have finished their own sync.",
+        "SUREST WORKAROUND (use it when the default will not hold): BillFree does NOT have to be the Windows default - it only has to be the printer the POS prints to. Select BillFree inside the POS's own print setting (busy-select-printer, tally-select-printer, gofrugal-select-printer, marg-config and the other per-POS select-printer records). Then no default-printer reset can bypass BillFree.",
+        "VERIFY: make one real bill from the POS -> the BillFree popup / digital bill appears and a PDF + JSON lands in C:\\BillFree\\Data. ESCALATE to L2 only if BillFree is selected in the POS and bills still bypass it - send the Get-CimInstance output before and after a restart, the Windows edition/build, and whether Parallels or Remote Desktop is in use."
+      ],
+      "tags": [
+        "default printer",
+        "set as default",
+        "set as default not working",
+        "set default does nothing",
+        "default printer changes",
+        "default printer resets",
+        "default printer keeps changing",
+        "default printer changing back",
+        "own printer default",
+        "cannot make billfree default",
+        "let windows manage my default printer",
+        "legacydefaultprintermode",
+        "synchronize default printer",
+        "share mac printers",
+        "parallels",
+        "mac",
+        "remote desktop default printer",
+        "rdp default printer",
+        "printui",
+        "startup script",
+        "bills bypass billfree",
+        "no digital bill",
+        "snmp",
+        "offline"
+      ],
+      "level": "L1",
+      "images": [],
+      "last_verified": "2026-09",
+      "visibility": "public",
+      "related": [
+        "ci-mac-windows",
+        "ci-0x709",
+        "ci-rdp",
+        "ci-popup-missing",
+        "setup-universal",
+        "print-triage"
       ]
     }
   ],

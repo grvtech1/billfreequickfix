@@ -235,11 +235,24 @@
     {
       "q": "cannot set billfree as default printer his own printer stays default parallels",
       "expect": [
+        "ci-default-printer",
         "ci-mac-windows"
       ]
     },
     {
       "q": "how to create custom local port for billfree printer",
+      "expect": [
+        "ci-mac-windows"
+      ]
+    },
+    {
+      "q": "set as default does nothing billfree default printer keeps changing back to his own printer",
+      "expect": [
+        "ci-default-printer"
+      ]
+    },
+    {
+      "q": "no lpt port on mac created standard tcp ip port with dummy ip for billfree printer",
       "expect": [
         "ci-mac-windows"
       ]
