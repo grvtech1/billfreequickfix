@@ -2605,7 +2605,8 @@ export const KB = {
         "ci-printer-driver",
         "ci-print-cutoff",
         "ci-longbill-split",
-        "print-triage"
+        "print-triage",
+        "ci-mac-windows"
       ]
     },
     {
@@ -3237,16 +3238,18 @@ export const KB = {
       "cause": "On an Apple-silicon Mac (M1-M4) Windows 11 is the ARM64 edition, which cannot load x64 printer drivers - so InstallPrinter (which installs the bundled HP driver from its x64/x86 folder and binds it to LPT1:) fails, and the VM may have no LPT1: port at all. Separately, Parallels 'Synchronize default printer' and Windows 'Let Windows manage my default printer' keep switching the default back to the Mac / customer printer, so bills silently bypass BillFree. Field fix: add the BillFree printer manually on the Microsoft XPS Class Driver (in-box, installs on ARM) bound to a Local Port LPT1:.",
       "solution": [
         "IDENTIFY THE MAC: in Windows open Settings > System > About > System type. 'ARM-based processor' = Apple-silicon Mac -> x64 drivers cannot install (this is why the HP BillFree driver fails) -> follow the steps below. 'x64-based processor' = Intel Mac -> installs like a normal PC: run InstallPrinter from C:\\BillFree\\Support as Administrator (setup-universal).",
+        "INSTALL THE UTILITY FIRST: install the BillFree Universal MSI as normal (setup-universal) - on ARM only the InstallPrinter script step fails. Skip that script and add the printer manually as below.",
+        "CLEAN UP THE FAILED ATTEMPT: Settings > Printers & scanners > remove any half-installed 'BillFree' / 'BillFree (Copy 1)' printer left by the failed script. Otherwise the new printer gets a different name and no longer matches Target Printer = BillFree in BillFree Configuration.",
         "FIX PARALLELS FIRST: Parallels > Actions > Configure > Hardware > Print > UNTICK 'Synchronize default printer' (if greyed out, shut Windows down - not suspend - then change it). If Hardware lists a 'Printer' (LPT) device, remove it so it cannot grab LPT1:. VMware Fusion: Virtual Machine > Settings > Printer > turn printer sharing off.",
         "ADD THE PRINTER MANUALLY: Settings > Bluetooth & devices > Printers & scanners > Add device > 'Add manually' > 'Add a local printer or network printer with manual settings' > Next.",
-        "CHOOSE THE PORT: 'Use an existing port' = LPT1: (the same port BillFree's own script uses). If LPT1: is NOT in the list: select 'Create a new port' > Type of port = 'Local Port' > Next > enter the port name  LPT1:  > OK. (Admin PowerShell alternative: Add-PrinterPort -Name \"LPT1:\"). Do NOT use FILE: or PORTPROMPT: (they ask for a file name on every print), and do not use USB / TCP-IP / Mac-shared printer ports.",
+        "CHOOSE THE PORT: 'Use an existing port' = LPT1: (the same port BillFree's own script uses). To check what exists: Admin PowerShell  Get-PrinterPort | Select-Object Name. If LPT1: is NOT listed: select 'Create a new port' > Type of port = 'Local Port' > Next > enter the port name  LPT1:  > OK (or Admin PowerShell: Add-PrinterPort -Name \"LPT1:\"). Do NOT use FILE: or PORTPROMPT: (they ask for a file name on every print), NUL: (the job is discarded), or USB / TCP-IP / Mac-shared printer ports.",
         "CHOOSE THE DRIVER: Manufacturer 'Microsoft' > 'Microsoft XPS Class Driver' (built into Windows, installs on ARM - this is what worked in the field when the HP BillFree driver would not). Name the printer exactly  BillFree  and do not share it.",
-        "Already added on another port? Printer properties > Ports tab > tick LPT1: > Apply (or Admin PowerShell: Set-Printer -Name \"BillFree\" -PortName \"LPT1:\"). Restart the Print Spooler afterwards.",
-        "SET BILLFREE AS DEFAULT: Settings > Printers & scanners > turn OFF 'Let Windows manage my default printer' > BillFree > Set as default (or Admin CMD: rundll32 printui.dll,PrintUIEntry /y /n \"BillFree\", or run C:\\BillFree\\Support\\SetBillFreeDefaultPrinter.bat). If it still reverts: regedit > HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows > DWORD LegacyDefaultPrinterMode = 1. Error 0x00000709 => ci-0x709. Workaround: select BillFree inside the POS's own printer setting - then the Windows default does not matter.",
+        "Already added on another port? Printer properties > Ports tab > tick LPT1: > Apply. If LPT1: is missing there: Add Port... > Local Port > New Port... > type  LPT1:  > OK > Close > tick it > Apply (or Admin PowerShell: Set-Printer -Name \"BillFree\" -PortName \"LPT1:\"). Restart the Print Spooler afterwards.",
+        "SET BILLFREE AS DEFAULT: first confirm BillFree shows in Printers & scanners with no driver error (a printer whose driver failed cannot become the default). Then Settings > Printers & scanners > turn OFF 'Let Windows manage my default printer' > BillFree > Set as default (or Admin CMD: rundll32 printui.dll,PrintUIEntry /y /n \"BillFree\", or run C:\\BillFree\\Support\\SetBillFreeDefaultPrinter.bat). If it still reverts: regedit > HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows > DWORD LegacyDefaultPrinterMode = 1. Error 0x00000709 => ci-0x709. Workaround: select BillFree inside the POS's own printer setting - then the Windows default does not matter.",
         "PHYSICAL (THERMAL) PRINTER: plug it into the Mac, then Parallels > Devices > USB & Bluetooth > connect it to WINDOWS and install its Windows driver. Use that printer as Fwd Target Printer. Avoid the Mac-shared copy of the printer - it prints through a generic driver and often gets the 3-inch width wrong.",
         "BILLFREE CONFIGURATION: Target Printer = BillFree, Forward Print Job = Yes, Fwd Target Printer = the thermal printer connected in the previous step. Save.",
         "LIMIT: the Microsoft XPS Class Driver supports Letter/A4 only, so bills longer than ~11 inches get cut (digital and print) - see ci-longbill-split / ci-printer-driver. For long bills on an ARM Mac, check Add a printer > driver screen > 'Windows Update' for HP DesignJet T2600 / T530 V4: only drivers that appear there can install on ARM.",
-        "VERIFY: print from Notepad to BillFree -> a PDF + JSON appears in C:\\BillFree\\Data -> the digital bill arrives -> the paper copy prints. Then restart Windows and confirm BillFree is STILL the default printer (proves the Parallels sync is off).",
+        "VERIFY: print from Notepad to BillFree -> a PDF + JSON appears in C:\\BillFree\\Data -> the digital bill arrives -> the paper copy prints. Then print one REAL 3-inch bill from the POS: if the thermal copy is cut on the right or shrunk, fix the paper size (ci-rightcut / ci-printer-driver). Finally restart Windows and confirm BillFree is STILL the default printer (proves the Parallels sync is off).",
         "ESCALATE: if the printer installs but NOTHING lands in C:\\BillFree\\Data after a test print, stop troubleshooting the Mac - escalate to L2 as 'Universal on Windows 11 ARM (Mac M-series)' with the System type, Windows version, Parallels/Fusion version and BillFree utility version."
       ],
       "tags": [
@@ -3285,7 +3288,10 @@ export const KB = {
         "default printer not changing",
         "default printer resets",
         "synchronize default printer",
-        "let windows manage my default printer"
+        "let windows manage my default printer",
+        "copy 1",
+        "remove printer",
+        "get-printerport"
       ],
       "level": "L1",
       "images": [],
@@ -3297,7 +3303,8 @@ export const KB = {
         "ci-printer-driver",
         "ci-0x709",
         "ci-longbill-split",
-        "print-triage"
+        "print-triage",
+        "ci-rightcut"
       ]
     }
   ],
