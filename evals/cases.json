@@ -274,6 +274,20 @@
       "expect": [
         "ci-rdp"
       ]
+    },
+    {
+      "q": "installprinter error 0x800f0214 the specified path does not contain any applicable device infs",
+      "expect": [
+        "ci-mac-windows",
+        "ci-printer-install"
+      ]
+    },
+    {
+      "q": "billfree printer showing offline is it normal work offline",
+      "expect": [
+        "setup-universal",
+        "ci-mac-windows"
+      ]
     }
   ]
 }

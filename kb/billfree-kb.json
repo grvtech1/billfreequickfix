@@ -20,7 +20,7 @@
         "The utility installs to C:\\BillFree by default. Confirm the BillFree folder now exists on Local Disk (C:).",
         "Inside C:\\BillFree you'll see the working folders: Data (uploaded PDF+JSON invoices), Doc, Support (printer install scripts), and Temp.",
         "Install the virtual printer driver: open C:\\BillFree\\Support and run the script that matches the OS — InstallPrinter_Win10.bat for Windows 10/11 (use InstallPrinter_Win7.bat on Windows 7). Right-click > Run as administrator.",
-        "The script runs rundll32 printui.dll,PrintUIEntry commands: it removes any old 'BillFree' printer, installs the bundled HP driver (from the x64/x86 subfolder), renames it to 'BillFree', and binds it to port lpt1:. Let the command window finish.",
+        "The script runs rundll32 printui.dll,PrintUIEntry commands: it removes any old 'BillFree' printer and driver, installs the bundled driver HP Ink Tank Wireless 410 series PCL-3 (V4 - file x64\\hpygid25_V4.inf) as a printer named 'BillFree' on port lpt1:, then sets the printer to WORK OFFLINE and starts Bill_Free.exe. The 'Offline' status is intentional - never switch the BillFree printer back online. Safest way to run it: open CMD as Administrator > cd /d C:\\BillFree\\Support > InstallPrinter_Win10.bat (the script finds the driver by a relative x64\\ path, so it must run from the Support folder). Error 0x800f0214 at this step = ARM Windows (Windows on a Mac) - see ci-mac-windows.",
         "In the same Support folder, run SetBillFreeDefaultPrinter.bat to make BillFree the default Windows printer (run SetCustomPaperSize.bat too if a custom paper size is needed).",
         "Open the BillFree Configuration screen and set: Folder Path = C:\\BillFree\\Data; Merchant ID = the merchant's MID (e.g. 28669); Target Printer = BillFree; Print Options = tick 'BillFree' and 'BillFree + Print'; Config Mode = Yes (keep ON for a first-time integration); Forward Print Job = Yes with Fwd Target Printer = the customer's physical printer. Leave the rest at defaults (Enable Logging = Yes, AutoPrintMode = Yes, PDF Mode = Auto). Click Save.",
         "Done. The utility now intercepts every print, converts it to PDF + JSON into C:\\BillFree\\Data, and uploads to the server — the customer receives the digital bill via WhatsApp + SMS. Verify with a test print (see appendix-checklist)."
@@ -2132,7 +2132,9 @@
         "Cause 2 (32/64-bit mismatch): verify OS bitness in System Properties; use the matching installer.",
         "Cause 3 (Windows Server compat): confirm the Server version (2012/2016) is supported by the driver.",
         "Cause 4 (Protected Print Mode): gpedit.msc > 'Point and Print Restrictions' > disable or add exception.",
-        "Cause 5 (Windows on a Mac - Parallels / VMware Fusion): Settings > System > About shows 'ARM-based processor' => x64 printer drivers cannot install. Add the printer manually on the Microsoft XPS Class Driver + Local Port LPT1: - see ci-mac-windows."
+        "Cause 5 (Windows on a Mac - Parallels / VMware Fusion): Settings > System > About shows 'ARM-based processor' => x64 printer drivers cannot install. Add the printer manually on the Microsoft XPS Class Driver + Local Port LPT1: - see ci-mac-windows.",
+        "Cause 6 (error 0x800f0214 'The specified path does not contain any applicable device INFs' while InstallPrinter runs): the driver file WAS found but does not fit this Windows - the x64 HP driver on ARM Windows (Windows on an Apple-silicon Mac) or on 32-bit Windows. Check: Admin CMD > echo %PROCESSOR_ARCHITECTURE% . ARM64 => do not retry the script - add BillFree on the Microsoft XPS Class Driver (ci-mac-windows).",
+        "Cause 7 (script runs but no BillFree printer appears): run it from the Support folder - Admin CMD > cd /d C:\\BillFree\\Support > InstallPrinter_Win10.bat. The script finds x64\\hpygid25_V4.inf by a relative path, and a script started with right-click > Run as administrator can start in C:\\Windows\\System32 instead. Also check the port lpt1: exists (Get-PrinterPort) - on VMs / Macs it may be missing."
       ],
       "tags": [
         "printer",
@@ -2142,7 +2144,10 @@
         "server",
         "gpedit",
         "mac",
-        "arm"
+        "arm",
+        "0x800f0214",
+        "applicable device infs",
+        "installprinter"
       ],
       "level": "L1",
       "images": [],
@@ -2971,7 +2976,7 @@
       "solution": [
         "CHOOSE THE DRIVER by use case. Normal-length bills, OR RDP / printer redirection: use the Microsoft XPS Class Driver (or Microsoft OpenXPS Class Driver 2). It is XPS-native (clean capture), always available without Windows Update, and redirects cleanly over RDP.",
         "Long receipts that EXCEED ~14 inches (longer than Legal): use an HP DesignJet V4 driver - only it supports custom / long page sizes. The Microsoft class drivers are Letter/A4 only and will clip long bills.",
-        "Between DesignJet options: HP DesignJet T2600 V4 is the safe default (most common, most stable, best match for BillFree's parser). Choose HP DesignJet Z9+ Pro V4 (or Z6800 V4) only if the long bill carries a QR / logo and you want the cleanest raster capture. Both handle receipt lengths far beyond 14 inches. Avoid HP DesignJet Z2100 (not V4) and HP Ink Tank / PCL-3 drivers as the base.",
+        "Between DesignJet options: HP DesignJet T2600 V4 is the safe default (most common, most stable, best match for BillFree's parser). Choose HP DesignJet Z9+ Pro V4 (or Z6800 V4) only if the long bill carries a QR / logo and you want the cleanest raster capture. Both handle receipt lengths far beyond 14 inches. Avoid HP DesignJet Z2100 (not V4) as the base. Note: BillFree's OWN installer uses HP Ink Tank Wireless 410 series PCL-3 (V4, x64\\hpygid25_V4.inf) - that is the standard driver for normal bills; do not swap it for other home-inkjet drivers (DeskJet etc.) when troubleshooting.",
         "INSTALL - preferred: run BillFree's own InstallPrinter script from C:\\BillFree\\Support\\ (e.g. InstallPrinter_Win10.bat) as Administrator. It creates the 'BillFree' printer with the exact driver BillFree expects - use this whenever possible.",
         "INSTALL - manual (if the script is missing): Control Panel > Devices and Printers > Add a printer > 'The printer that I want isn't listed' > 'Add a local printer'. Keep the port BillFree uses.",
         "On 'Install the printer driver': for the Microsoft class driver pick Manufacturer 'Microsoft' > 'Microsoft XPS Class Driver' (no Windows Update needed). For a DesignJet, click 'Windows Update' first (wait a few minutes for the catalogue to load), then Manufacturer 'HP' > 'HP DesignJet T2600 V4' - or use 'Have Disk' with the DesignJet .inf downloaded from HP. Name the printer as BillFree expects (usually 'BillFree').",
@@ -3005,7 +3010,10 @@
         "clipped",
         "page size",
         "have disk",
-        "windows update"
+        "windows update",
+        "hp ink tank wireless 410",
+        "hpygid25_v4",
+        "work offline"
       ],
       "level": "L1",
       "last_verified": "2026-07",
@@ -3278,17 +3286,18 @@
       "category": "Common Issue",
       "system": "Printer",
       "type": "howto",
-      "symptom": "Windows running on a Mac / MacBook (Parallels, VMware Fusion): BillFree HP printer driver will not install, no LPT1 port in the port list, and BillFree cannot be set as the default printer (the customer's own printer stays default)",
+      "symptom": "Windows running on a Mac / MacBook (Parallels, VMware Fusion): BillFree HP printer driver will not install (InstallPrinter error 0x800f0214 'The specified path does not contain any applicable device INFs'), no LPT1 port in the port list, and BillFree cannot be set as the default printer (the customer's own printer stays default)",
       "cause": "On an Apple-silicon Mac (M1-M4) Windows 11 is the ARM64 edition, which cannot load x64 printer drivers - so InstallPrinter (which installs the bundled HP driver from its x64/x86 folder and binds it to LPT1:) fails, and the VM may have no LPT1: port at all. Separately, Parallels 'Synchronize default printer' and Windows 'Let Windows manage my default printer' keep switching the default back to the Mac / customer printer, so bills silently bypass BillFree. Field fix (Sep 2026, Windows 11 on a MacBook): the HP driver would not install and there was no LPT port, so the BillFree printer was added manually on the Microsoft XPS Class Driver (in-box, installs on ARM) bound to a Standard TCP/IP port with a dummy IP (10.0.0.1). The default printer still would not stick - see ci-default-printer.",
       "solution": [
-        "IDENTIFY THE MAC: in Windows open Settings > System > About > System type. 'ARM-based processor' = Apple-silicon Mac -> x64 drivers cannot install (this is why the HP BillFree driver fails) -> follow the steps below. 'x64-based processor' = Intel Mac -> installs like a normal PC: run InstallPrinter from C:\\BillFree\\Support as Administrator (setup-universal).",
+        "IDENTIFY THE MAC: in Windows open Settings > System > About > System type (or Admin CMD: echo %PROCESSOR_ARCHITECTURE%). 'ARM-based processor' / ARM64 = Apple-silicon Mac -> x64 drivers cannot install. The official InstallPrinter_Win10.bat then fails with error 0x800f0214 'The specified path does not contain any applicable device INFs' (field-confirmed) - do not retry it, follow the steps below. 'x64-based processor' = Intel Mac -> installs like a normal PC: run InstallPrinter from C:\\BillFree\\Support as Administrator (setup-universal).",
         "INSTALL THE UTILITY FIRST: install the BillFree Universal MSI as normal (setup-universal) - on ARM only the InstallPrinter script step fails. Skip that script and add the printer manually as below.",
-        "CLEAN UP THE FAILED ATTEMPT: Settings > Printers & scanners > remove any half-installed 'BillFree' / 'BillFree (Copy 1)' printer left by the failed script. Otherwise the new printer gets a different name and no longer matches Target Printer = BillFree in BillFree Configuration.",
+        "CLEAN UP THE FAILED ATTEMPT: Settings > Printers & scanners > remove any half-installed 'BillFree' / 'BillFree (Copy 1)' printer left by the failed script. Note the official script DELETES the existing BillFree printer before it fails, so a BillFree printer you added earlier by hand is gone after running it - re-add it. A leftover duplicate gets a different name and no longer matches Target Printer = BillFree in BillFree Configuration.",
         "FIX PARALLELS FIRST: Parallels > Actions > Configure > Hardware > Print > UNTICK 'Synchronize default printer' (if greyed out, shut Windows down - not suspend - then change it). If Hardware lists a 'Printer' (LPT) device, remove it so it cannot grab LPT1:. VMware Fusion: Virtual Machine > Settings > Printer > turn printer sharing off.",
         "ADD THE PRINTER MANUALLY: Settings > Bluetooth & devices > Printers & scanners > Add device > 'Add manually' > 'Add a local printer or network printer with manual settings' > Next.",
         "CHOOSE THE PORT: if LPT1: is in the list, use it (the same port BillFree's own script uses). Check with Admin PowerShell  Get-PrinterPort | Select-Object Name . NO LPT PORT (field case - worked): 'Create a new port' > 'Standard TCP/IP Port' > Next > Hostname or IP address = a dummy IP (field used 10.0.0.1) > untick 'Query the printer and automatically select the driver' > Next > if asked for additional port information choose Device Type = Standard 'Generic Network Card' > Next. BillFree captures the job at the print layer, so the port only has to exist. Pick an IP that is not a real device on that network (if the customer's router is 10.0.0.1, use an unused address). Alternative: 'Create a new port' > Local Port > name  LPT1: . Do NOT use FILE: or PORTPROMPT: (they ask for a file name on every print), NUL: (the job is discarded), or USB / Mac-shared printer ports.",
         "CHOOSE THE DRIVER: Manufacturer 'Microsoft' > 'Microsoft XPS Class Driver' (built into Windows, installs on ARM - this is what worked in the field when the HP BillFree driver would not). Name the printer exactly  BillFree  and do not share it.",
         "After adding (TCP/IP dummy port): printer properties > Ports > Configure Port > UNTICK 'SNMP Status Enabled' so Windows does not poll the fake IP and mark BillFree Offline. To move an existing printer to a port: Ports tab > tick the port > Apply (or Admin PowerShell: Set-Printer -Name \"BillFree\" -PortName \"<port name>\"). Restart the Print Spooler afterwards.",
+        "WORK OFFLINE (match the official installer): BillFree's own InstallPrinter sets the printer to Work Offline, so set it the same way on a manual install - Admin CMD:  rundll32 printui.dll,PrintUIEntry /Xs /n \"BillFree\" Attributes WorkOffline . The 'Offline' status is normal for the BillFree printer - never switch it back online.",
         "SET BILLFREE AS DEFAULT: first confirm BillFree shows in Printers & scanners with no driver error (a printer whose driver failed cannot become the default). Turn OFF 'Let Windows manage my default printer' > BillFree > Set as default. If the click does nothing or it keeps switching back to the customer's own printer (field case - the simple fix did not hold) => follow ci-default-printer: diagnose write vs reset, untick BOTH Parallels 'Synchronize default printer' and 'Share Mac printers with Windows', lock LegacyDefaultPrinterMode = 1, add the startup backstop - or simply select BillFree inside the POS's own printer setting.",
         "PHYSICAL (THERMAL) PRINTER: plug it into the Mac, then Parallels > Devices > USB & Bluetooth > connect it to WINDOWS and install its Windows driver. Use that printer as Fwd Target Printer. Avoid the Mac-shared copy of the printer - it prints through a generic driver and often gets the 3-inch width wrong.",
         "BILLFREE CONFIGURATION: Target Printer = BillFree, Forward Print Job = Yes, Fwd Target Printer = the thermal printer connected in the previous step. Save.",
@@ -3341,7 +3350,12 @@
         "dummy ip",
         "10.0.0.1",
         "snmp",
-        "generic network card"
+        "generic network card",
+        "0x800f0214",
+        "applicable device infs",
+        "specified path does not contain",
+        "work offline",
+        "processor_architecture"
       ],
       "level": "L1",
       "images": [],
