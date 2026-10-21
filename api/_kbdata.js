@@ -3450,15 +3450,15 @@ export const KB = {
       "system": "Tally",
       "type": "printing",
       "symptom": "Tally Prime: one bill comes in TWO pages (digital bill / PDF export / print) - page 1 says \"continued to page number 2\" and the Total, amount in words, bank details and signature move to page 2, even for a bill with only a few items",
-      "cause": "Tally lays out the invoice using its own Export / Print Configuration, not the paper. If Top Margin + Height of the invoice is larger than the page (A4 = 11.69 in), the footer no longer fits on page 1 and Tally pushes it to a second page. Common with letterhead formats: a large Top Margin (e.g. 1.75 in) is kept for the printed header, while the invoice height is left at a full-page value (e.g. 11.80 in, taller than A4 itself). Same rule across the width: Left Margin + Width must fit the page width (A4 = 8.27 in). Number of copies above 1 also adds extra pages. Applies to Tally API integration (the BillFree TDL builds the PDF with Tally's own engine) and to Universal / printed bills. Field-verified Oct 2026 (Tally Prime API, A4 jewellery letterhead): reducing the invoice height fixed it - bill came on one page.",
+      "cause": "Tally lays out the invoice using its own Export / Print Configuration, not the paper. If Top Margin + Height of the invoice is larger than the page (A4 = 11.69 in), the footer no longer fits on page 1 and Tally pushes it to a second page. Common with letterhead formats: a large Top Margin (e.g. 1.75 in) is kept for the printed header, while the invoice height is left at a full-page value (e.g. 11.80 in, taller than A4 itself). Same rule across the width: Left Margin + Width must fit the page width (A4 = 8.27 in). Number of copies above 1 also adds extra pages. Applies to Tally API integration (the BillFree TDL builds the PDF with Tally's own engine) and to Universal / printed bills. Field-verified Oct 2026 (Tally Prime API, A4 jewellery letterhead): reducing the invoice height in the EXPORT Configuration (Alt+E > Configure) fixed it - bill came on one page; the Print Configuration was not the cause.",
       "solution": [
         "CONFIRM: open the bill PDF (or Tally print preview). Page 1 ends with \"continued to page number 2\" and page 2 holds only the totals / footer, while page 1 has empty space -> this record. If the bill genuinely has many items and fills page 1, two pages are expected (not this problem).",
-        "OPEN BOTH CONFIGURATIONS (fix them identically - the BillFree TDL may use either): Export = open the voucher > Alt+E > Current > Configure. Print = open the voucher > Ctrl+P > Configure.",
+        "WHERE TO FIX (field-verified): Tally API integration / digital bill PDF -> the EXPORT Configuration: open the voucher > Alt+E (Export) > Current > Configure. This is where the field case was fixed - the Print Configuration did not need changing. The paper print / Universal (BillFree printer) uses the PRINT Configuration instead: Ctrl+P > Configure - change it only if the printed bill also splits.",
         "APPLY THE RULE: Top Margin + Height of invoice + room for any printed footer band must be at or below the page height. A4 = 11.69 in | Letter = 11.00 in | A5 portrait = 8.27 in. Example (A4 letterhead, top margin 1.75 in, small footer band): 11.69 - 1.75 - 0.4 = about 9.5 -> set Height of normal invoice = 9.50 (was 11.80).",
         "Set the same value for \"Height of simple invoice\" if simple invoices are used. Keep the Top Margin the letterhead needs; lower it (e.g. 1.75 -> 1.50) only if the printed header allows.",
         "CHECK THE WIDTH TOO: Left Margin + Width of invoice must fit the page width (A4 = 8.27 in). E.g. left margin 1 + width 8.30 = 9.30 in is too wide - reduce Width (e.g. 7.00) if the right-side Amount column clips.",
         "Number of copies = 1 for export / digital bill (2 copies adds ORIGINAL + DUPLICATE pages to the PDF). Page Size must match the real paper / letterhead (A4).",
-        "Ctrl+A to accept both configurations. Test on a NEW bill (already-sent bills are not regenerated): API integration -> save a bill with the mobile number, answer Yes to \"send invoice to BillFree\", open the WhatsApp PDF; Universal / print -> print to the BillFree printer and check the digital bill + paper.",
+        "Ctrl+A to accept. Test on a NEW bill (already-sent bills are not regenerated): API integration -> save a bill with the mobile number, answer Yes to \"send invoice to BillFree\", open the WhatsApp PDF; Universal / print -> print to the BillFree printer and check the digital bill + paper.",
         "PASS = one page with items, Total, amount in words, bank details, declaration and signature, and no \"continued to page number 2\"; header / footer of the letterhead do not overlap the text. Still two pages -> lower the height in steps of 0.5 in (9.0, 8.5) or reduce the top margin.",
         "If changing the configuration has NO effect on the BillFree PDF, the TDL is using fixed settings -> escalate to BillFree L2 with the 2-page PDF, screenshots of both configurations and the bill number."
       ],
@@ -3485,7 +3485,8 @@ export const KB = {
         "number of copies",
         "tally api",
         "pdf two pages",
-        "digital bill two pages"
+        "digital bill two pages",
+        "export configuration fix"
       ],
       "level": "L1",
       "images": [],
