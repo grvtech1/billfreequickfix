@@ -306,6 +306,24 @@
       "expect": [
         "tally-twopage"
       ]
+    },
+    {
+      "q": "tally tdl added but not showing loaded",
+      "expect": [
+        "tally-tdl-notloaded"
+      ]
+    },
+    {
+      "q": "billfree tally api tcp not inserted status not loaded update tally license",
+      "expect": [
+        "tally-tdl-notloaded"
+      ]
+    },
+    {
+      "q": "tally addon not showing after loading tdl ask tally id and password",
+      "expect": [
+        "tally-tdl-notloaded"
+      ]
     }
   ]
 }

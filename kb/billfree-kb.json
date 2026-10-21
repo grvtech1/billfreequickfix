@@ -556,7 +556,8 @@
       "related": [
         "tally-api-tdl",
         "tally-select-printer",
-        "setup-printing-types"
+        "setup-printing-types",
+        "tally-tdl-notloaded"
       ]
     },
     {
@@ -668,7 +669,8 @@
         "tally-api-tdl",
         "tally-select-printer",
         "setup-universal",
-        "ci-notdeliver-nodata"
+        "ci-notdeliver-nodata",
+        "tally-tdl-notloaded"
       ]
     },
     {
@@ -680,7 +682,7 @@
       "cause": "API push model via TDL addon.",
       "solution": [
         "F1 Help > TDLs & Add Ons > F4 Manage Local TDL. Set 'Load TDLs on startup' = Yes.",
-        "Select from Drive: C:\\BillFree\\BillFreeTallyApi.tcp (path may differ in Tally Cloud). Ensure LOADED.",
+        "Select from Drive: C:\\BillFree\\BillFreeTallyApi.tcp (path may differ in Tally Cloud). Ensure LOADED. Not showing Loaded => tally-tdl-notloaded (usually: update the Tally licence with the Tally ID + password).",
         "Sidebar > F6 Addon Features. Enable BillFree addon = Yes. Press Esc.",
         "Gateway of Tally > BillFree > Login. Enter merchant BillFree credentials, Accept = Yes. Wait for 'Login Successfully'.",
         "After login a setup plugin downloads. Wait for 'Installation Done' popup.",
@@ -735,7 +737,8 @@
         "tally-mobile-tdl",
         "tally-billtransfer",
         "api-flow",
-        "tally-twopage"
+        "tally-twopage",
+        "tally-tdl-notloaded"
       ]
     },
     {
@@ -2493,7 +2496,7 @@
         "Cause 2 (AV quarantine): check antivirus quarantine/blocked log, restore BillFree.exe, add permanent exception.",
         "Cause 3 (wrong printer): ensure POS isn't printing to the physical printer; set default invoice printer to BillFree in Tally/Busy/Marg.",
         "Cause 4 (inactive MID): confirm MID is Active in backend.",
-        "Cause 5 (Tally TDL): ensure the TDL is loaded and active (see Tally API section)."
+        "Cause 5 (Tally TDL): ensure the TDL is loaded and active (see Tally API section). If the TDL will not show Loaded, see tally-tdl-notloaded."
       ],
       "tags": [
         "popup",
@@ -2516,7 +2519,8 @@
       "visibility": "public",
       "related": [
         "setup-printing-types",
-        "ci-default-printer"
+        "ci-default-printer",
+        "tally-tdl-notloaded"
       ]
     },
     {
@@ -3498,6 +3502,58 @@
         "busy-twopage",
         "ci-print-cutoff",
         "print-triage"
+      ]
+    },
+    {
+      "id": "tally-tdl-notloaded",
+      "category": "POS Integration",
+      "system": "Tally",
+      "type": "error",
+      "symptom": "Tally: BillFree TDL added (BillFreeTallyApi.tcp / BilltransferPrime.tcp / BillFreeUniTallyPrime.tcp) but it does not show LOADED - status stays not loaded / error, the BillFree menu or \"send invoice to BillFree\" popup never appears",
+      "cause": "Tally loads a compiled TDL (.tcp) only after checking the licence on that PC. If the licence information stored locally is stale or out of sync (TSS renewed, licence moved or reactivated, PC changed), Tally refuses to load the TDL even though the path is correct. Field-verified Oct 2026 (Tally API integration): updating the Tally licence info by signing in with the merchant's Tally ID and password made the TDL load. Other, simpler causes to rule out: wrong file path, \"Load TDLs on startup\" = No, or the wrong TDL for the Tally version (ERP 9 vs Prime).",
+      "solution": [
+        "READ THE STATUS FIRST: F1 (Help) > TDLs & Add-Ons > F4 Manage Local TDLs. Look at the Status next to the BillFree .tcp - it should say Loaded. Note any error text shown there (it tells you the cause).",
+        "QUICK CHECKS: \"Load TDLs on startup\" = Yes; the path points to the real file (e.g. C:\\BillFree\\BillFreeTallyApi.tcp - the path can differ in Tally on Cloud / RDP); the TDL matches the Tally edition (Prime TDL for TallyPrime, ERP 9 TDL for Tally.ERP 9). Fix any of these, then restart Tally.",
+        "MAIN FIX (field-verified) - UPDATE THE TALLY LICENCE: ask the merchant (or their Tally partner) for the Tally ID (registered e-mail) and Tally password. In TallyPrime: F1 (Help) > Settings > License > Update License (or the licence options on the startup screen) > sign in with the Tally ID + password. The PC must be online. Let it finish, then close and reopen Tally.",
+        "Reopen F4 Manage Local TDLs - the BillFree TDL should now show Loaded. If it still does not, remove the TDL entry, add it again from the drive (Select from Drive > the .tcp), set Load on startup = Yes, restart Tally.",
+        "API integration only: after it loads, F6 Addon Features > BillFree addon = Yes > Gateway of Tally > BillFree > Login with the merchant's BillFree credentials and wait for \"Login Successfully\" and \"Installation Done\" (see tally-api-tdl).",
+        "VERIFY: create a bill with the mobile number in the Phone No. field and save -> the \"Do you want to send invoice to BillFree\" popup appears -> Yes -> the digital bill reaches WhatsApp.",
+        "If the merchant does not know the Tally ID / password, or the licence itself has expired (TSS expired, licence surrendered, educational mode), the merchant or their Tally partner must renew / reactivate the licence first - BillFree cannot do this for them. Escalate to L2 only if the licence is active and updated and the TDL still will not load, with a screenshot of the Manage Local TDLs status and the Tally version."
+      ],
+      "tags": [
+        "tally",
+        "tally prime",
+        "tdl",
+        "tcp",
+        "tdl not loaded",
+        "tdl not loading",
+        "not loaded",
+        "not inserted",
+        "tdl status",
+        "manage local tdl",
+        "load tdls on startup",
+        "tally licence",
+        "tally license",
+        "update license",
+        "licence info",
+        "tally id",
+        "tally password",
+        "tally.net",
+        "tss",
+        "billfreetallyapi",
+        "tally api",
+        "billtransfer",
+        "addon not showing"
+      ],
+      "level": "L1",
+      "images": [],
+      "last_verified": "2026-10",
+      "visibility": "public",
+      "related": [
+        "tally-api-tdl",
+        "tally-mobile-tdl",
+        "tally-billtransfer",
+        "ci-popup-missing"
       ]
     }
   ],
