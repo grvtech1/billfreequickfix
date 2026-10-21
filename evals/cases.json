@@ -288,6 +288,24 @@
         "setup-universal",
         "ci-mac-windows"
       ]
+    },
+    {
+      "q": "tally prime one bill coming in two pages continued to page number 2",
+      "expect": [
+        "tally-twopage"
+      ]
+    },
+    {
+      "q": "tally api digital bill pdf exporting in two pages letterhead top margin",
+      "expect": [
+        "tally-twopage"
+      ]
+    },
+    {
+      "q": "footer bank details signature going to second page in tally invoice",
+      "expect": [
+        "tally-twopage"
+      ]
     }
   ]
 }

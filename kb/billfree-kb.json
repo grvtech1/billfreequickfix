@@ -419,7 +419,8 @@
       "cause": "Page size mismatch.",
       "solution": [
         "Set BillFree printer properties page size to A4.",
-        "Set customer's main printer properties page size to A4."
+        "Set customer's main printer properties page size to A4.",
+        "Tally, or a bill whose footer moves to page 2 (\"continued to page number 2\") => see tally-twopage: the invoice height + top margin in the POS layout is larger than the page."
       ],
       "tags": [
         "busy",
@@ -432,7 +433,8 @@
       "visibility": "public",
       "related": [
         "busy-a5",
-        "print-triage"
+        "print-triage",
+        "tally-twopage"
       ]
     },
     {
@@ -584,7 +586,8 @@
         "tally-bitmap-mode",
         "print-triage",
         "tally-mobile-tdl",
-        "tally-billtransfer"
+        "tally-billtransfer",
+        "tally-twopage"
       ]
     },
     {
@@ -731,7 +734,8 @@
         "tally-invoice-title",
         "tally-mobile-tdl",
         "tally-billtransfer",
-        "api-flow"
+        "api-flow",
+        "tally-twopage"
       ]
     },
     {
@@ -2375,7 +2379,8 @@
         "setup-config-popup",
         "ci-rightcut",
         "ci-longbill-split",
-        "print-triage"
+        "print-triage",
+        "tally-twopage"
       ]
     },
     {
@@ -2905,7 +2910,8 @@
         "tally-invoice-title",
         "ci-webpos-parsing",
         "print-triage",
-        "ci-rdp"
+        "ci-rdp",
+        "tally-twopage"
       ],
       "images": [
         {
@@ -2953,7 +2959,8 @@
       "visibility": "public",
       "related": [
         "tally-api-tdl",
-        "tally-bitmap-mode"
+        "tally-bitmap-mode",
+        "tally-twopage"
       ],
       "images": [
         {
@@ -3212,7 +3219,7 @@
         "Cut on the RIGHT edge => ci-rightcut (AutoPrintMode = NO, then a custom paper size / form).",
         "Cut at the BOTTOM / last lines missing => ci-print-cutoff.",
         "Long bill SPLITS into two parts => ci-longbill-split (increase the form length).",
-        "Prints on A4 instead of 3-inch / wrong page size => ci-pagesize-a4a5, busy-3inch, marg-a4instead3. A5 problems => ci-pagesize-a5, ci-a5-portrait. Two pages => busy-twopage.",
+        "Prints on A4 instead of 3-inch / wrong page size => ci-pagesize-a4a5, busy-3inch, marg-a4instead3. A5 problems => ci-pagesize-a5, ci-a5-portrait. Two pages => busy-twopage (Busy), tally-twopage (Tally: \"continued to page number 2\", invoice height + top margin > page).",
         "Text too small / scaling wrong => ci-scaling. Remote Desktop: BillFree printer not redirecting, HP BillFree printer will not install, or 'invalid file' / 0 KB in the logs => ci-rdp (Microsoft XPS Class Driver for A4/A5, TSPrint server + client).",
         "Nothing prints from an MFP / inkjet => ci-mfp-noprint. Error 0x709 => ci-0x709. Printer will not install => ci-printer-install. Windows on a Mac (Parallels / Fusion: driver fails, no LPT port) => ci-mac-windows. BillFree will not stay the default printer (bills bypass BillFree) => ci-default-printer. Properties error => ci-printer-props.",
         "The POS is printing to the wrong printer => the per-POS select-printer records: busy-select-printer, tally-select-printer, gofrugal-select-printer, zorder-select, shopper-select, logics-select, drishti-select, monark-select, acme-printer, arnon-printer, eshopaid-windows.",
@@ -3237,7 +3244,8 @@
         "parallels",
         "default printer",
         "rdp",
-        "0 kb"
+        "0 kb",
+        "two pages"
       ],
       "level": "L1",
       "last_verified": "2026-08",
@@ -3278,7 +3286,8 @@
         "eshopaid-windows",
         "busy-twopage",
         "ci-mac-windows",
-        "ci-default-printer"
+        "ci-default-printer",
+        "tally-twopage"
       ]
     },
     {
@@ -3430,6 +3439,63 @@
         "ci-rdp",
         "ci-popup-missing",
         "setup-universal",
+        "print-triage"
+      ]
+    },
+    {
+      "id": "tally-twopage",
+      "category": "POS Integration",
+      "system": "Tally",
+      "type": "printing",
+      "symptom": "Tally Prime: one bill comes in TWO pages (digital bill / PDF export / print) - page 1 says \"continued to page number 2\" and the Total, amount in words, bank details and signature move to page 2, even for a bill with only a few items",
+      "cause": "Tally lays out the invoice using its own Export / Print Configuration, not the paper. If Top Margin + Height of the invoice is larger than the page (A4 = 11.69 in), the footer no longer fits on page 1 and Tally pushes it to a second page. Common with letterhead formats: a large Top Margin (e.g. 1.75 in) is kept for the printed header, while the invoice height is left at a full-page value (e.g. 11.80 in, taller than A4 itself). Same rule across the width: Left Margin + Width must fit the page width (A4 = 8.27 in). Number of copies above 1 also adds extra pages. Applies to Tally API integration (the BillFree TDL builds the PDF with Tally's own engine) and to Universal / printed bills. Field-verified Oct 2026 (Tally Prime API, A4 jewellery letterhead): reducing the invoice height fixed it - bill came on one page.",
+      "solution": [
+        "CONFIRM: open the bill PDF (or Tally print preview). Page 1 ends with \"continued to page number 2\" and page 2 holds only the totals / footer, while page 1 has empty space -> this record. If the bill genuinely has many items and fills page 1, two pages are expected (not this problem).",
+        "OPEN BOTH CONFIGURATIONS (fix them identically - the BillFree TDL may use either): Export = open the voucher > Alt+E > Current > Configure. Print = open the voucher > Ctrl+P > Configure.",
+        "APPLY THE RULE: Top Margin + Height of invoice + room for any printed footer band must be at or below the page height. A4 = 11.69 in | Letter = 11.00 in | A5 portrait = 8.27 in. Example (A4 letterhead, top margin 1.75 in, small footer band): 11.69 - 1.75 - 0.4 = about 9.5 -> set Height of normal invoice = 9.50 (was 11.80).",
+        "Set the same value for \"Height of simple invoice\" if simple invoices are used. Keep the Top Margin the letterhead needs; lower it (e.g. 1.75 -> 1.50) only if the printed header allows.",
+        "CHECK THE WIDTH TOO: Left Margin + Width of invoice must fit the page width (A4 = 8.27 in). E.g. left margin 1 + width 8.30 = 9.30 in is too wide - reduce Width (e.g. 7.00) if the right-side Amount column clips.",
+        "Number of copies = 1 for export / digital bill (2 copies adds ORIGINAL + DUPLICATE pages to the PDF). Page Size must match the real paper / letterhead (A4).",
+        "Ctrl+A to accept both configurations. Test on a NEW bill (already-sent bills are not regenerated): API integration -> save a bill with the mobile number, answer Yes to \"send invoice to BillFree\", open the WhatsApp PDF; Universal / print -> print to the BillFree printer and check the digital bill + paper.",
+        "PASS = one page with items, Total, amount in words, bank details, declaration and signature, and no \"continued to page number 2\"; header / footer of the letterhead do not overlap the text. Still two pages -> lower the height in steps of 0.5 in (9.0, 8.5) or reduce the top margin.",
+        "If changing the configuration has NO effect on the BillFree PDF, the TDL is using fixed settings -> escalate to BillFree L2 with the 2-page PDF, screenshots of both configurations and the bill number."
+      ],
+      "tags": [
+        "tally",
+        "tally prime",
+        "two page",
+        "two pages",
+        "2 page",
+        "bill in two pages",
+        "second page",
+        "continued to page number 2",
+        "page 2",
+        "footer on next page",
+        "export configuration",
+        "print configuration",
+        "alt+e",
+        "ctrl+p",
+        "height of normal invoice",
+        "height of simple invoice",
+        "top margin",
+        "letterhead",
+        "a4",
+        "number of copies",
+        "tally api",
+        "pdf two pages",
+        "digital bill two pages"
+      ],
+      "level": "L1",
+      "images": [],
+      "last_verified": "2026-10",
+      "visibility": "public",
+      "related": [
+        "tally-api-tdl",
+        "tally-invoice-title",
+        "tally-bitmap-mode",
+        "tally-select-printer",
+        "busy-twopage",
+        "ci-print-cutoff",
         "print-triage"
       ]
     }
