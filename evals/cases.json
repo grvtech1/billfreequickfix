@@ -324,6 +324,24 @@
       "expect": [
         "tally-tdl-notloaded"
       ]
+    },
+    {
+      "q": "bill amount wrong on every bill parsing rule offset picks gross instead of net amount",
+      "expect": [
+        "ci-amount-parsing"
+      ]
+    },
+    {
+      "q": "amount changes every bill crystal report parsing start line keyword offset",
+      "expect": [
+        "ci-amount-parsing"
+      ]
+    },
+    {
+      "q": "how to make net amount parse correctly add label formula field in crystal report",
+      "expect": [
+        "ci-amount-parsing"
+      ]
     }
   ]
 }

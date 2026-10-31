@@ -221,7 +221,8 @@
         "ci-webpos-parsing",
         "print-triage",
         "busy-mobile-field",
-        "tally-mobile-tdl"
+        "tally-mobile-tdl",
+        "ci-amount-parsing"
       ]
     },
     {
@@ -289,7 +290,8 @@
       "last_verified": "2026-05",
       "visibility": "internal",
       "related": [
-        "setup-universal"
+        "setup-universal",
+        "ci-amount-parsing"
       ]
     },
     {
@@ -2915,7 +2917,8 @@
         "ci-webpos-parsing",
         "print-triage",
         "ci-rdp",
-        "tally-twopage"
+        "tally-twopage",
+        "ci-amount-parsing"
       ],
       "images": [
         {
@@ -3164,7 +3167,8 @@
         "ci-printer-driver",
         "ci-blackbar-preview",
         "tally-bitmap-mode",
-        "print-triage"
+        "print-triage",
+        "ci-amount-parsing"
       ]
     },
     {
@@ -3554,6 +3558,63 @@
         "tally-mobile-tdl",
         "tally-billtransfer",
         "ci-popup-missing"
+      ]
+    },
+    {
+      "id": "ci-amount-parsing",
+      "category": "Common Issue",
+      "system": "Universal Utility",
+      "type": "error",
+      "symptom": "Universal parsing: Bill Amount is wrong or different on every bill (picks the gross / MRP total or a label instead of the net amount), although the mobile number, invoice number and date parse fine",
+      "cause": "BillFree reads the XPS text as lines, and Bill Amount rules that use line OFFSETS (e.g. \"Terms & Conditions\" -2, \"Total\" -2, \"Total T\" +1) only work if the lines always come in the same order. The Total row of a report is several separate text objects on the same height (label \"Total\", qty + gross \"0 6425\", the net amount \"4,800\", a symbol \"T\"), and the order they are written into the XPS can change from bill to bill (gross before or after the amount, \"Total\" and \"T\" merged on one line or split). An offset then lands on the gross line, on \"Total\", or on an unrelated number, so the amount keeps changing. Fields that parse reliably (Inv.No. :, DT :) do so because the label and the value are in ONE line. Field-verified Oct 2026 (Crystal Reports 8 estimate report): putting a label and the net amount in a single text object and reading it with a keyword rule fixed it on every bill.",
+      "solution": [
+        "CONFIRM THE PATTERN: Download Sample XPS for 5-8 different bills and look at the lines around the total. If the same amount sits at different line positions (above or below the gross / \"Total\" line), offsets cannot work - go to the permanent fix. Note which database field is the net amount.",
+        "PERMANENT FIX - make the amount carry its own label in ONE text object (do this in the POS report / invoice format; ask the POS vendor if you cannot): a formula that joins label and value, e.g. Crystal: \"NetAmt: \" & ToText({Table.Net_Amount}, 0, \"\"). Short label, unique in the bill (not \"Total\"). Use the field that is the net amount actually printed on the bill.",
+        "CRYSTAL REPORTS (what worked in the field): open the report in the SAME Crystal version the POS uses (Crystal 8 report -> Crystal 8 designer; do NOT save it from a newer Crystal such as 2016 - a newer file cannot be opened by an older runtime). Make a backup copy first. Right-click the net amount box and read \"Field: ...\" for its name. Insert > Formula Field > New > name it > enter the formula > Check > Save and close. Drag the formula from Field Explorer into the footer.",
+        "Right-click the OLD amount box > Format Field > Common > Suppress (do not delete it). Size the new box so the whole text fits INSIDE the printable page width: Object Size and Position, X = (right end of the footer line) - Width, Width about 0.9 in for a 3-inch bill, font 8, right-aligned. WARNING: anything outside the page edge is clipped and the clipped characters are dropped from the XPS (field case: \"NetAmt: 3\" instead of \"NetAmt: 3900\") - always check Print Preview with a long amount.",
+        "BILLFREE RULE: Bill Amount - Start Line Keyword = the label (e.g. NetAmt), End Line Keyword = the same label, offsets EMPTY, Keyword Before = the label with colon (e.g. NetAmt:). Delete the old offset-based Bill Amount rules (they are what pick the wrong line).",
+        "TEST: print 8-10 different bills (with and without discount, amount under 1,000, 5-digit amount, 1 item and many items) and check Download Sample XPS shows the label + full amount each time, and the amount in the BillFree bill is the NET amount. Also check the paper bill still shows the amount.",
+        "INTERIM ONLY (when the report cannot be changed yet) - ordered offset rules that cover the layouts seen so far: (1) keyword \"Total T\" offset +1, (2) \"Total\" offset +2, (3) \"Total\" offset -2. Start and End keyword/offset identical in each rule. They cover only the orders already seen, so a new order can pick the gross again - spot-check the backend amounts of this merchant until the permanent fix is done.",
+        "Cannot edit the report: send the POS vendor the formula in step 2 (or ask for a printed \"label: net amount\" line), and ask BillFree dev for a rule that takes the number-only line and rejects an amount larger than the gross total (BRD: position-aware parsing, never-guess)."
+      ],
+      "tags": [
+        "bill amount wrong",
+        "amount wrong",
+        "amount changes",
+        "amount different every bill",
+        "wrong amount",
+        "amount not correct",
+        "gross amount instead of net",
+        "mrp total picked",
+        "parsing rule",
+        "parsing rules",
+        "config rules",
+        "start line keyword",
+        "start offset",
+        "end offset",
+        "keyword before",
+        "offset",
+        "text order",
+        "line order",
+        "xps text order",
+        "crystal report",
+        "crystal reports 8",
+        "formula field",
+        "net amount",
+        "estimate",
+        "download sample xps",
+        "field mapper",
+        "total"
+      ],
+      "level": "L2",
+      "images": [],
+      "last_verified": "2026-10",
+      "visibility": "public",
+      "related": [
+        "setup-printing-types",
+        "ci-webpos-parsing",
+        "setup-directory",
+        "tally-bitmap-mode"
       ]
     }
   ],
